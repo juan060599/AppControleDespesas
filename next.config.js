@@ -1,6 +1,16 @@
 /** @type {import('next').NextConfig} */
+const withPWA = require('next-pwa')({
+  dest: 'public',
+  disable: process.env.NODE_ENV === 'development',
+  register: true,
+  skipWaiting: true,
+  sw: 'sw.js',
+  buildExcludes: [/middleware-manifest.json$/],
+})
+
 const nextConfig = {
   reactStrictMode: true,
+  output: 'export', // Para gerar HTML estático em ./out
 }
 
-module.exports = nextConfig
+module.exports = withPWA(nextConfig)

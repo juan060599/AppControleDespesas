@@ -272,7 +272,7 @@ export default function BudgetManager({
                     color: colors.secondary[900],
                     cursor: editing ? 'not-allowed' : 'pointer',
                     opacity: editing ? 0.6 : 1,
-                    transition: transitions.default,
+                    transition: transitions.normal,
                     boxSizing: 'border-box',
                   }}
                   onFocus={(e) => {
@@ -325,7 +325,7 @@ export default function BudgetManager({
                     fontSize: typography.body.fontSize,
                     backgroundColor: colors.background.lighter,
                     color: colors.secondary[900],
-                    transition: transitions.default,
+                    transition: transitions.normal,
                     boxSizing: 'border-box',
                   }}
                   onFocus={(e) => {

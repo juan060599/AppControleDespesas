@@ -182,7 +182,7 @@ export default function SpendingAlerts({ transactions }: { transactions: Transac
             display: 'flex',
             gap: spacing.md,
             alignItems: 'flex-start',
-            transition: transitions.default,
+            transition: transitions.normal,
             cursor: 'pointer',
           }}
           onMouseEnter={(e) => {

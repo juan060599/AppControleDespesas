@@ -170,7 +170,7 @@ export default function BudgetTracker({ transactions, budgets, onEdit, onDelete 
                       alignItems: 'center',
                       gap: spacing.xs,
                       fontSize: typography.small.fontSize,
-                      transition: transitions.default,
+                      transition: transitions.normal,
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.background = colors.primary[600]
@@ -195,7 +195,7 @@ export default function BudgetTracker({ transactions, budgets, onEdit, onDelete 
                       alignItems: 'center',
                       gap: spacing.xs,
                       fontSize: typography.small.fontSize,
-                      transition: transitions.default,
+                      transition: transitions.normal,
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.background = colors.status.error + '30'

@@ -154,7 +154,7 @@ export default function SpendingSuggestions({ transactions }: { transactions: Tr
             display: 'flex',
             gap: spacing.md,
             alignItems: 'flex-start',
-            transition: transitions.default,
+            transition: transitions.normal,
             cursor: 'pointer',
           }}
           onMouseEnter={(e) => {

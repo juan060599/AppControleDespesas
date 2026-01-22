@@ -40,8 +40,8 @@ export default function CategoryAlerts({ userId }: CategoryAlertsProps) {
       ])
 
       const limits = limitsResult.data || []
-      const thisMonth = thisMonthResult.data || {}
-      const lastMonth = lastMonthResult.data || {}
+      const thisMonth = (thisMonthResult.data || {}) as Record<string, number>
+      const lastMonth = (lastMonthResult.data || {}) as Record<string, number>
 
       const newAlerts: Alert[] = []
 

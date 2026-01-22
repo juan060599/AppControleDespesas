@@ -43,7 +43,7 @@ echo    SERVIDOR INICIANDO...
 echo ====================================
 echo.
 echo 📱 No emulador do Android Studio:
-echo    Navegador ^> http://10.0.2.2:3001
+echo    Navegador ^> http://10.0.2.2:3000
 echo.
 echo 💻 No PC:
 echo    Navegador ^> http://localhost:3000

@@ -24,8 +24,8 @@ export default function NotificationBell({ userId }: NotificationBellProps) {
         ])
 
         const limits = limitsRes.data || []
-        const thisMonth = thisMonthRes.data || {}
-        const lastMonth = lastMonthRes.data || {}
+        const thisMonth = (thisMonthRes.data || {}) as Record<string, number>
+        const lastMonth = (lastMonthRes.data || {}) as Record<string, number>
 
         const newAlerts: any[] = []
 

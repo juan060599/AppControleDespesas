@@ -161,7 +161,7 @@ export default function AdminPanel() {
                 fontSize: '14px',
                 backgroundColor: colors.background.lighter,
                 color: colors.secondary[900],
-                transition: transitions.default,
+                transition: transitions.normal,
                 boxSizing: 'border-box',
               }}
               onFocus={(e) => {
@@ -191,7 +191,7 @@ export default function AdminPanel() {
                     border: `2px solid ${selectedRole === role ? colors.primary[500] : colors.primary[200]}`,
                     borderRadius: borderRadius.md,
                     cursor: 'pointer',
-                    transition: transitions.default,
+                    transition: transitions.normal,
                   }}
                   onMouseEnter={(e) => {
                     if (selectedRole !== role) {
@@ -232,7 +232,7 @@ export default function AdminPanel() {
               fontWeight: 'bold',
               cursor: loading || !emailInput.trim() ? 'not-allowed' : 'pointer',
               opacity: loading || !emailInput.trim() ? 0.6 : 1,
-              transition: transitions.default,
+              transition: transitions.normal,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -318,7 +318,7 @@ export default function AdminPanel() {
                 cursor: 'pointer',
                 fontSize: '12px',
                 fontWeight: 'bold',
-                transition: transitions.default,
+                transition: transitions.normal,
               }}
               onMouseEnter={(e) => {
                 ;(e.target as HTMLButtonElement).style.backgroundColor = colors.primary[200]

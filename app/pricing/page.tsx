@@ -293,7 +293,7 @@ export default function PricingPage() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: spacing.sm,
-                transition: transitions.default,
+                transition: transitions.normal,
                 opacity: processing ? 0.6 : 1,
               }}
               onMouseEnter={(e) => {

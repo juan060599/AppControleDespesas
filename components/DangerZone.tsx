@@ -86,7 +86,7 @@ export default function DangerZone({ onDeleteSuccess }: DangerZoneProps) {
             alignItems: 'center',
             justifyContent: 'center',
             gap: spacing.sm,
-            transition: transitions.default,
+            transition: transitions.normal,
           }}
           onMouseEnter={(e) => {
             ;(e.target as HTMLButtonElement).style.backgroundColor = colors.status.error
@@ -170,7 +170,7 @@ export default function DangerZone({ onDeleteSuccess }: DangerZoneProps) {
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: spacing.sm,
-                transition: transitions.default,
+                transition: transitions.normal,
               }}
             >
               {deleting && <Loader size={18} style={{ animation: 'spin 1s linear infinite' }} />}
@@ -194,7 +194,7 @@ export default function DangerZone({ onDeleteSuccess }: DangerZoneProps) {
                 fontWeight: 'bold',
                 cursor: deleting ? 'not-allowed' : 'pointer',
                 opacity: deleting ? 0.6 : 1,
-                transition: transitions.default,
+                transition: transitions.normal,
               }}
               onMouseEnter={(e) => {
                 if (!deleting) {
