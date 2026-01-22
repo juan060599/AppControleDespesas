@@ -1,6 +1,6 @@
 # Controle de Despesas e Receitas
 
-Aplicação web moderna para controle de receitas e despesas com dashboard interativo e análises visuais.
+Aplicação web moderna para controle de receitas e despesas com dashboard interativo e análises visuais. **Agora com Gastos Recorrentes e Metas Financeiras!**
 
 ## 🎯 Características
 
@@ -15,13 +15,15 @@ Aplicação web moderna para controle de receitas e despesas com dashboard inter
 - **Categorização**: Organizador por categorias personalizadas
 - **Banco de Dados Seguro**: Integração com Supabase com Row-Level Security (RLS)
 - **Responsivo**: Design mobile-first com Tailwind CSS
+- **🔄 NOVO - Gastos Recorrentes**: Rastrear assinaturas e contas periódicas (Netflix, seguro, etc)
+- **🏆 NOVO - Metas Financeiras**: Visualizar progresso em direção aos objetivos com barra de progresso
 
 ## 🛠️ Tecnologias Utilizadas
 
 - **Frontend**: Next.js 15, React 18, TypeScript
 - **Estilos**: Tailwind CSS
 - **Gráficos**: Recharts
-- **Backend/Database**: Supabase
+- **Backend/Database**: Supabase PostgreSQL
 - **Autenticação**: Supabase Auth
 - **UI Icons**: Lucide React
 

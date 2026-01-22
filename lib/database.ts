@@ -85,6 +85,59 @@ export async function getTransactions(userId: string) {
   return { data, error }
 }
 
+export async function getTransactionsByPeriod(
+  userId: string,
+  startDate: string,
+  endDate: string
+) {
+  const { data, error } = await supabase
+    .from('transactions')
+    .select('*')
+    .eq('user_id', userId)
+    .gte('date', startDate)
+    .lte('date', endDate)
+    .order('date', { ascending: false })
+  return { data, error }
+}
+
+export function getPeriodDates(period: 'current-month' | 'last-month' | 'last-3-months' | 'last-6-months' | 'last-year' | 'all-time') {
+  const now = new Date()
+  const currentYear = now.getFullYear()
+  const currentMonth = now.getMonth()
+  
+  let startDate: Date
+  let endDate = new Date()
+  
+  switch (period) {
+    case 'current-month':
+      startDate = new Date(currentYear, currentMonth, 1)
+      break
+    case 'last-month':
+      startDate = new Date(currentYear, currentMonth - 1, 1)
+      endDate = new Date(currentYear, currentMonth, 0)
+      break
+    case 'last-3-months':
+      startDate = new Date(currentYear, currentMonth - 3, 1)
+      break
+    case 'last-6-months':
+      startDate = new Date(currentYear, currentMonth - 6, 1)
+      break
+    case 'last-year':
+      startDate = new Date(currentYear - 1, currentMonth, 1)
+      break
+    case 'all-time':
+      startDate = new Date(2020, 0, 1)
+      break
+    default:
+      startDate = new Date(currentYear, currentMonth, 1)
+  }
+  
+  return {
+    startDate: startDate.toISOString().split('T')[0],
+    endDate: endDate.toISOString().split('T')[0],
+  }
+}
+
 export async function updateTransaction(id: string, updates: Partial<Transaction>) {
   const { data, error } = await supabase
     .from('transactions')
@@ -394,4 +447,106 @@ export async function getCategorySpendingLastMonth(userId: string) {
   })
 
   return { data: categorySpending, error: null }
+}
+
+// RECURRING EXPENSES
+export interface RecurringExpense {
+  id: string
+  user_id: string
+  description: string
+  amount: number
+  category: string
+  frequency: 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'yearly'
+  next_charge_date: string
+  is_active: boolean
+  notes?: string
+  created_at: string
+  updated_at: string
+}
+
+export async function getRecurringExpenses(userId: string) {
+  const { data, error } = await supabase
+    .from('recurring_expenses')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('is_active', true)
+    .order('next_charge_date', { ascending: true })
+  return { data, error }
+}
+
+export async function addRecurringExpense(expense: Omit<RecurringExpense, 'id' | 'created_at' | 'updated_at'>) {
+  const { data, error } = await supabase
+    .from('recurring_expenses')
+    .insert([expense])
+    .select()
+  return { data, error }
+}
+
+export async function updateRecurringExpense(id: string, updates: Partial<RecurringExpense>) {
+  const { data, error } = await supabase
+    .from('recurring_expenses')
+    .update(updates)
+    .eq('id', id)
+    .select()
+  return { data, error }
+}
+
+export async function deleteRecurringExpense(id: string) {
+  const { error } = await supabase
+    .from('recurring_expenses')
+    .delete()
+    .eq('id', id)
+  return { error }
+}
+
+// FINANCIAL GOALS
+export interface FinancialGoal {
+  id: string
+  user_id: string
+  name: string
+  description?: string
+  target_amount: number
+  current_amount: number
+  goal_type: 'vacation' | 'emergency_fund' | 'debt_payoff' | 'investment' | 'purchase' | 'other'
+  target_date: string
+  icon?: string
+  color?: string
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export async function getFinancialGoals(userId: string) {
+  const { data, error } = await supabase
+    .from('financial_goals')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('is_active', true)
+    .order('target_date', { ascending: true })
+  return { data, error }
+}
+
+export async function addFinancialGoal(goal: Omit<FinancialGoal, 'id' | 'created_at' | 'updated_at'>) {
+  const { data, error } = await supabase
+    .from('financial_goals')
+    .insert([goal])
+    .select()
+  return { data, error }
+}
+
+export async function updateFinancialGoal(id: string, updates: Partial<FinancialGoal>) {
+  const { data, error } = await supabase
+    .from('financial_goals')
+    .update(updates)
+    .eq('id', id)
+    .select()
+  return { data, error }
+}
+
+export async function deleteFinancialGoal(id: string) {
+  const { error } = await supabase
+    .from('financial_goals')
+    .delete()
+    .eq('id', id)
+  return { error }
 }

@@ -127,7 +127,7 @@ export default function DashboardPage() {
           }}>
             {/* Dashboard Section */}
             <section>
-              <Dashboard transactions={transactions} />
+              <Dashboard transactions={transactions} userId={user.id} />
             </section>
 
             {/* Bank Statement Upload Section */}
