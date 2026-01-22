@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-
-const GEMINI_API_KEY = process.env.GOOGLE_GEMINI_API_KEY
+import { supabase } from '@/lib/supabase'
 
 interface ParsedTransaction {
   description: string
@@ -14,8 +13,25 @@ export async function POST(request: NextRequest) {
   try {
     const { fileContent, apiKey } = await request.json()
 
-    // Use API key from request or fallback to environment variable
-    const key = apiKey || GEMINI_API_KEY
+    // Try to use provided key first, then fetch from database
+    let key = apiKey
+    
+    if (!key) {
+      // Fetch from database
+      const { data, error } = await supabase
+        .from('api_keys')
+        .select('key_value')
+        .eq('key_name', 'GEMINI_API_KEY')
+        .single()
+      
+      if (error || !data?.key_value) {
+        return NextResponse.json(
+          { error: 'Chave Gemini API não configurada. Vá para Configurações e adicione sua chave.' },
+          { status: 400 }
+        )
+      }
+      key = data.key_value
+    }
 
     if (!key) {
       return NextResponse.json(

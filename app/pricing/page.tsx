@@ -91,7 +91,7 @@ export default function PricingPage() {
       <main style={{ maxWidth: '1200px', margin: '0 auto', padding: spacing.xl }}>
         {/* Botão voltar */}
         <button
-          onClick={() => router.back()}
+          onClick={() => router.push('/dashboard')}
           style={{
             display: 'flex',
             alignItems: 'center',

@@ -213,3 +213,66 @@ export async function setUserPlan(userId: string, planName: string, stripeSubscr
     .select()
   return { data, error }
 }
+
+// User roles functions
+export async function getUserRole(userId: string) {
+  const { data, error } = await supabase
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', userId)
+    .single()
+  return { role: data?.role || 'cliente', error }
+}
+
+export async function setUserRole(userId: string, role: 'admin' | 'cliente') {
+  const { data, error } = await supabase
+    .from('user_roles')
+    .upsert([
+      {
+        user_id: userId,
+        role: role,
+      },
+    ])
+    .select()
+  return { data, error }
+}
+
+export async function updateUserRoleByEmail(email: string, role: 'admin' | 'cliente') {
+  // First, find the user by email
+  const { data: authData } = await supabase.auth.admin.listUsers()
+  const user = authData?.users?.find((u) => u.email === email)
+  
+  if (!user) {
+    return { data: null, error: new Error('Usuário não encontrado') }
+  }
+
+  // Update the role
+  const result = await setUserRole(user.id, role)
+  return result
+}
+
+// API Keys functions
+export async function getApiKey(keyName: string) {
+  const { data, error } = await supabase
+    .from('api_keys')
+    .select('key_value')
+    .eq('key_name', keyName)
+    .single()
+  return { value: data?.key_value || '', error }
+}
+
+export async function getAllApiKeys() {
+  const { data, error } = await supabase
+    .from('api_keys')
+    .select('key_name, key_value, description')
+  return { data, error }
+}
+
+export async function updateApiKey(keyName: string, keyValue: string) {
+  const { data, error } = await supabase
+    .from('api_keys')
+    .update({ key_value: keyValue, updated_at: new Date().toISOString() })
+    .eq('key_name', keyName)
+    .select()
+  return { data, error }
+}

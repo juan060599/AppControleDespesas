@@ -105,7 +105,7 @@ export default function DashboardPage() {
       minHeight: '100vh',
       background: colors.background.lighter,
     }}>
-      <DashboardHeader userName={user.email || 'Usuário'} onLogout={handleLogout} />
+      <DashboardHeader userName={user.user_metadata?.name || user.email || 'Usuário'} onLogout={handleLogout} />
 
       {/* Main Content */}
       <main style={{

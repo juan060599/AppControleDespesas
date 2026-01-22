@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { colors, spacing, typography, shadows, borderRadius, transitions } from '@/lib/designSystem'
 import { Upload, FileText, Loader, CheckCircle, AlertCircle, Trash2 } from 'lucide-react'
 import { parseCSV, parseOFX } from '@/lib/aiAnalysis'
-import { addTransaction, getCurrentUser, getAnalysisUsage, incrementAnalysisUsage } from '@/lib/database'
+import { addTransaction, getCurrentUser, getAnalysisUsage, incrementAnalysisUsage, getUserRole } from '@/lib/database'
 
 interface BankStatementUploadProps {
   onTransactionsAdded?: () => void
@@ -29,13 +29,18 @@ export default function BankStatementUpload({ onTransactionsAdded }: BankStateme
   const [selectedTransactions, setSelectedTransactions] = useState<Set<number>>(new Set())
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all')
   const [analysisCount, setAnalysisCount] = useState(0)
-  const [analysisLimit] = useState(5)
+  const [analysisLimit] = useState(2)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
     const checkAnalysisUsage = async () => {
       try {
         const user = await getCurrentUser()
         if (!user) return
+
+        // Verificar se é admin
+        const { role } = await getUserRole(user.id)
+        setIsAdmin(role === 'admin')
 
         const now = new Date()
         const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
@@ -65,16 +70,9 @@ export default function BankStatementUpload({ onTransactionsAdded }: BankStateme
       return
     }
 
-    // Verificar limite de análises
-    if (analysisCount >= analysisLimit) {
+    // Verificar limite de análises (admin não tem limite)
+    if (!isAdmin && analysisCount >= analysisLimit) {
       setError(`❌ Você atingiu o limite de ${analysisLimit} análises este mês. Adquira o plano Pro para análises ilimitadas!`)
-      return
-    }
-
-    // Verificar se tem chave API configurada
-    const apiKey = localStorage.getItem('gemini_api_key')
-    if (!apiKey) {
-      setError('❌ Chave Gemini API não configurada. Vá para Configurações e adicione sua chave.')
       return
     }
 
@@ -108,7 +106,7 @@ export default function BankStatementUpload({ onTransactionsAdded }: BankStateme
         textToAnalyze = parseOFX(fileContent)
       }
 
-      // Call Gemini API route to analyze (with API key)
+      // Call Gemini API route to analyze (chave será buscada do banco pela rota)
       const response = await fetch('/api/analyze-gemini', {
         method: 'POST',
         headers: {
@@ -116,7 +114,6 @@ export default function BankStatementUpload({ onTransactionsAdded }: BankStateme
         },
         body: JSON.stringify({ 
           fileContent: textToAnalyze,
-          apiKey: apiKey 
         }),
       })
 
