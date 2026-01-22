@@ -302,21 +302,21 @@ export default function BankStatementUpload({ onTransactionsAdded }: BankStateme
         <div
           style={{
             padding: `${spacing.sm} ${spacing.md}`,
-            backgroundColor: analysisCount >= analysisLimit ? colors.status.error + '15' : colors.primary[50],
+            backgroundColor: analysisCount >= analysisLimit && analysisLimit !== 999999 ? colors.status.error + '15' : colors.primary[50],
             borderRadius: borderRadius.md,
-            border: `1px solid ${analysisCount >= analysisLimit ? colors.status.error : colors.primary[200]}`,
+            border: `1px solid ${analysisCount >= analysisLimit && analysisLimit !== 999999 ? colors.status.error : colors.primary[200]}`,
             textAlign: 'center',
           }}
         >
           <p style={{ ...typography.label, margin: 0, color: colors.secondary[900] }}>
-            {analysisCount}/{analysisLimit} análises
+            {isAdmin ? '∞ Ilimitado' : `${analysisCount}/${analysisLimit} análises`}
           </p>
           <p style={{
             ...typography.small,
             margin: `${spacing.xs} 0 0 0`,
-            color: analysisCount >= analysisLimit ? colors.status.error : colors.secondary[500],
+            color: isAdmin ? colors.status.success : (analysisCount >= analysisLimit ? colors.status.error : colors.secondary[500]),
           }}>
-            {analysisCount >= analysisLimit ? '❌ Limite atingido' : `${analysisLimit - analysisCount} restantes`}
+            {isAdmin ? '👑 Admin - Análises ilimitadas' : (analysisCount >= analysisLimit ? '❌ Limite atingido' : `${analysisLimit - analysisCount} restantes`)}
           </p>
         </div>
       </div>

@@ -276,3 +276,122 @@ export async function updateApiKey(keyName: string, keyValue: string) {
     .select()
   return { data, error }
 }
+
+// Category Limits functions
+export interface CategoryLimit {
+  id: string
+  user_id: string
+  category: string
+  limit_amount: number
+  created_at: string
+  updated_at: string
+}
+
+export async function getCategoryLimits(userId: string) {
+  const { data, error } = await supabase
+    .from('category_limits')
+    .select('*')
+    .eq('user_id', userId)
+    .order('category', { ascending: true })
+  return { data, error }
+}
+
+export async function setCategoryLimit(userId: string, category: string, limitAmount: number) {
+  // First try to find existing record
+  const { data: existing } = await supabase
+    .from('category_limits')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('category', category)
+    .single()
+
+  if (existing?.id) {
+    // Update existing record
+    const { data, error } = await supabase
+      .from('category_limits')
+      .update({
+        limit_amount: limitAmount,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', existing.id)
+      .select()
+    return { data, error }
+  } else {
+    // Insert new record
+    const { data, error } = await supabase
+      .from('category_limits')
+      .insert([
+        {
+          user_id: userId,
+          category: category,
+          limit_amount: limitAmount,
+        },
+      ])
+      .select()
+    return { data, error }
+  }
+}
+
+export async function deleteCategoryLimit(id: string) {
+  const { error } = await supabase
+    .from('category_limits')
+    .delete()
+    .eq('id', id)
+  return { error }
+}
+
+// Function to get spending by category for current month
+export async function getCategorySpendingThisMonth(userId: string) {
+  const now = new Date()
+  const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+    .toISOString()
+    .split('T')[0]
+
+  const { data, error } = await supabase
+    .from('transactions')
+    .select('category, amount')
+    .eq('user_id', userId)
+    .eq('type', 'expense')
+    .gte('date', firstDayOfMonth)
+
+  if (error || !data) {
+    return { data: {}, error }
+  }
+
+  const categorySpending: { [key: string]: number } = {}
+  data.forEach((t) => {
+    categorySpending[t.category] = (categorySpending[t.category] || 0) + t.amount
+  })
+
+  return { data: categorySpending, error: null }
+}
+
+// Function to get spending by category for previous month
+export async function getCategorySpendingLastMonth(userId: string) {
+  const now = new Date()
+  const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+  const firstDayLastMonth = new Date(firstDayOfMonth.getTime() - 1)
+  const lastMonthStart = new Date(firstDayLastMonth.getFullYear(), firstDayLastMonth.getMonth(), 1)
+    .toISOString()
+    .split('T')[0]
+  const lastMonthEnd = firstDayOfMonth.toISOString().split('T')[0]
+
+  const { data, error } = await supabase
+    .from('transactions')
+    .select('category, amount')
+    .eq('user_id', userId)
+    .eq('type', 'expense')
+    .gte('date', lastMonthStart)
+    .lt('date', lastMonthEnd)
+
+  if (error || !data) {
+    return { data: {}, error }
+  }
+
+  const categorySpending: { [key: string]: number } = {}
+  data.forEach((t) => {
+    categorySpending[t.category] = (categorySpending[t.category] || 0) + t.amount
+  })
+
+  return { data: categorySpending, error: null }
+}

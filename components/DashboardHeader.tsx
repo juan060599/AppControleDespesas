@@ -2,8 +2,10 @@
 
 import { colors, spacing, typography, shadows, borderRadius, transitions } from '@/lib/designSystem'
 import { LogOut, Menu, X, Settings } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import NotificationBell from './NotificationBell'
+import { getCurrentUser } from '@/lib/database'
 
 interface DashboardHeaderProps {
   userName: string
@@ -12,6 +14,16 @@ interface DashboardHeaderProps {
 
 export default function DashboardHeader({ userName, onLogout }: DashboardHeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [userId, setUserId] = useState<string | null>(null)
+
+  // Get user ID for notifications
+  useEffect(() => {
+    const getUser = async () => {
+      const user = await getCurrentUser()
+      if (user) setUserId(user.id)
+    }
+    getUser()
+  }, [])
 
   const handleLogout = async () => {
     if (confirm('Tem certeza que deseja sair?')) {
@@ -154,6 +166,9 @@ export default function DashboardHeader({ userName, onLogout }: DashboardHeaderP
               💳 Planos
             </button>
           </Link>
+
+          {/* Notification Bell */}
+          {userId && <NotificationBell userId={userId} />}
 
           {/* Settings Button */}
           <Link href="/settings" style={{ textDecoration: 'none' }}>

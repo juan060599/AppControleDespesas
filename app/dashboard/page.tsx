@@ -10,7 +10,7 @@ import TransactionList from '@/components/TransactionList'
 import BankStatementUpload from '@/components/BankStatementUpload'
 import SpendingAlerts from '@/components/SpendingAlerts'
 import SpendingSuggestions from '@/components/SpendingSuggestions'
-import SpendingPlanning from '@/components/SpendingPlanning'
+import CategoryLimitsTracker from '@/components/CategoryLimitsTracker'
 import { Transaction } from '@/lib/database'
 import { colors, spacing } from '@/lib/designSystem'
 
@@ -135,13 +135,12 @@ export default function DashboardPage() {
               <BankStatementUpload onTransactionsAdded={handleTransactionAdded} />
             </section>
 
-            {/* Spending Planning Section */}
-            <section>
-              <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: spacing.md as any, color: colors.secondary[900] }}>
-                📊 Planejamento de Gastos
-              </h2>
-              <SpendingPlanning transactions={transactions} />
-            </section>
+            {/* Category Limits Tracker Section */}
+            {user && (
+              <section>
+                <CategoryLimitsTracker userId={user.id} transactions={transactions} />
+              </section>
+            )}
 
             {/* Spending Alerts Section */}
             <section>

@@ -6,6 +6,7 @@ import { getCurrentUser, signOut, getUserRole, setUserRole } from '@/lib/databas
 import DashboardHeader from '@/components/DashboardHeader'
 import ApiKeySettings from '@/components/ApiKeySettings'
 import DangerZone from '@/components/DangerZone'
+import CategoryLimits from '@/components/CategoryLimits'
 import { colors, spacing, typography } from '@/lib/designSystem'
 import { ArrowLeft } from 'lucide-react'
 
@@ -283,6 +284,14 @@ export default function SettingsPage() {
               </div>
             </section>
           )}
+        </div>
+
+        {/* Category Limits Management */}
+        <div style={{ marginTop: spacing.xl }}>
+          <CategoryLimits 
+            userId={user.id} 
+            onLimitsUpdated={() => setRefreshTrigger((prev) => prev + 1)}
+          />
         </div>
 
         {/* Danger Zone */}

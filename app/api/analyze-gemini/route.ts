@@ -47,9 +47,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const prompt = `Extraia TODAS as transações. Responda APENAS com JSON válido, sem markdown, sem explicações.
+    const prompt = `Extraia TODAS as transações. Para CADA transação, inclua o nome do estabelecimento na descrição quando disponível.
+Formato: "Estabelecimento - Descrição" ou apenas "Descrição" se não houver estabelecimento.
+Responda APENAS com JSON válido, sem markdown, sem explicações.
 
-[{"date":"2026-01-02","description":"Pix recebido","amount":24.00,"type":"income","category":"Outros"},{"date":"2026-01-05","description":"Compra débito","amount":31.90,"type":"expense","category":"Alimentação"}]
+[{"date":"2026-01-02","description":"Pix - João Silva","amount":24.00,"type":"income","category":"Outros"},{"date":"2026-01-05","description":"Mercado X - Compra","amount":31.90,"type":"expense","category":"Alimentação"}]
 
 Extrato:
 ${fileContent}`

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getAnalysisUsage, getCurrentUser } from '@/lib/database'
+import { getAnalysisUsage, getCurrentUser, getUserRole } from '@/lib/database'
 
 export function useAnalysisLimit() {
   const [analysisCount, setAnalysisCount] = useState(0)
@@ -13,6 +13,16 @@ export function useAnalysisLimit() {
         const user = await getCurrentUser()
         if (!user) {
           setCanAnalyze(false)
+          setIsLoading(false)
+          return
+        }
+
+        // Check if user is admin (unlimited analyses)
+        const { role } = await getUserRole(user.id)
+        if (role === 'admin') {
+          setAnalysisLimit(999999) // Unlimited for admins
+          setAnalysisCount(0)
+          setCanAnalyze(true)
           setIsLoading(false)
           return
         }
