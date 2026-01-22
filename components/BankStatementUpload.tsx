@@ -44,6 +44,13 @@ export default function BankStatementUpload({ onTransactionsAdded }: BankStateme
       return
     }
 
+    // Verificar se tem chave API configurada
+    const apiKey = localStorage.getItem('gemini_api_key')
+    if (!apiKey) {
+      setError('❌ Chave Gemini API não configurada. Vá para Configurações e adicione sua chave.')
+      return
+    }
+
     setLoading(true)
     setAnalyzing(true)
     setError('')
@@ -74,13 +81,16 @@ export default function BankStatementUpload({ onTransactionsAdded }: BankStateme
         textToAnalyze = parseOFX(fileContent)
       }
 
-      // Call Gemini API route to analyze
+      // Call Gemini API route to analyze (with API key)
       const response = await fetch('/api/analyze-gemini', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ fileContent: textToAnalyze }),
+        body: JSON.stringify({ 
+          fileContent: textToAnalyze,
+          apiKey: apiKey 
+        }),
       })
 
       if (!response.ok) {

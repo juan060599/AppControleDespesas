@@ -12,14 +12,17 @@ interface ParsedTransaction {
 
 export async function POST(request: NextRequest) {
   try {
-    if (!GEMINI_API_KEY) {
+    const { fileContent, apiKey } = await request.json()
+
+    // Use API key from request or fallback to environment variable
+    const key = apiKey || GEMINI_API_KEY
+
+    if (!key) {
       return NextResponse.json(
-        { error: 'GOOGLE_GEMINI_API_KEY não configurada no servidor' },
-        { status: 500 }
+        { error: 'Chave Gemini API não configurada. Vá para Configurações e adicione sua chave.' },
+        { status: 400 }
       )
     }
-
-    const { fileContent } = await request.json()
 
     if (!fileContent) {
       return NextResponse.json(
@@ -37,7 +40,7 @@ ${fileContent}`
 
     const response = await fetch(
         
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`,
       {
         method: 'POST',
         headers: {

@@ -1,8 +1,9 @@
 'use client'
 
 import { colors, spacing, typography, shadows, borderRadius, transitions } from '@/lib/designSystem'
-import { LogOut, Menu, X } from 'lucide-react'
+import { LogOut, Menu, X, Settings } from 'lucide-react'
 import { useState } from 'react'
+import Link from 'next/link'
 
 interface DashboardHeaderProps {
   userName: string
@@ -123,6 +124,37 @@ export default function DashboardHeader({ userName, onLogout }: DashboardHeaderP
               {userName.charAt(0).toUpperCase()}
             </div>
           </div>
+
+          {/* Settings Button */}
+          <Link href="/settings" style={{ textDecoration: 'none' }}>
+            <button
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: spacing.sm,
+                padding: `10px ${spacing.md}`,
+                background: colors.primary[50],
+                border: `1px solid ${colors.primary[200]}`,
+                borderRadius: borderRadius.lg,
+                color: colors.primary[600],
+                fontSize: '14px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: transitions.normal,
+              }}
+              onMouseEnter={(e) => {
+                ;(e.target as HTMLButtonElement).style.background = colors.primary[100]
+                ;(e.target as HTMLButtonElement).style.borderColor = colors.primary[300]
+              }}
+              onMouseLeave={(e) => {
+                ;(e.target as HTMLButtonElement).style.background = colors.primary[50]
+                ;(e.target as HTMLButtonElement).style.borderColor = colors.primary[200]
+              }}
+            >
+              <Settings size={16} />
+              <span>Configurações</span>
+            </button>
+          </Link>
 
           {/* Logout Button */}
           <button

@@ -93,6 +93,14 @@ export async function deleteTransaction(id: string) {
   return { error }
 }
 
+export async function deleteAllTransactions(userId: string) {
+  const { error } = await supabase
+    .from('transactions')
+    .delete()
+    .eq('user_id', userId)
+  return { error }
+}
+
 // Budgets functions
 export async function addBudget(budget: Omit<Budget, 'id' | 'created_at'>) {
   const { data, error } = await supabase
