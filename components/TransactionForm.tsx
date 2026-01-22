@@ -1,18 +1,18 @@
 'use client'
 
-import { useState } from 'react'
-import { addTransaction } from '@/lib/database'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { addTransaction, getCurrentUser } from '@/lib/database'
+import { colors, spacing, typography, shadows, borderRadius, transitions } from '@/lib/designSystem'
+import { Plus, ArrowUpRight, ArrowDownLeft } from 'lucide-react'
 
 const EXPENSE_CATEGORIES = ['Alimentação', 'Transporte', 'Habitação', 'Saúde', 'Educação', 'Lazer', 'Outros']
 const INCOME_CATEGORIES = ['Salário', 'Freelance', 'Investimentos', 'Outros']
 
 interface TransactionFormProps {
-  userId: string
-  onSuccess?: () => void
+  onTransactionAdded?: () => void
 }
 
-export default function TransactionForm({ userId, onSuccess }: TransactionFormProps) {
+export default function TransactionForm({ onTransactionAdded }: TransactionFormProps) {
   const [type, setType] = useState<'income' | 'expense'>('expense')
   const [description, setDescription] = useState('')
   const [amount, setAmount] = useState('')
@@ -20,7 +20,17 @@ export default function TransactionForm({ userId, onSuccess }: TransactionFormPr
   const [date, setDate] = useState(new Date().toISOString().split('T')[0])
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const router = useRouter()
+  const [userId, setUserId] = useState<string>('')
+
+  useEffect(() => {
+    const loadUser = async () => {
+      const user = await getCurrentUser()
+      if (user) {
+        setUserId(user.id)
+      }
+    }
+    loadUser()
+  }, [])
 
   const categories = type === 'expense' ? EXPENSE_CATEGORIES : INCOME_CATEGORIES
 
@@ -28,7 +38,7 @@ export default function TransactionForm({ userId, onSuccess }: TransactionFormPr
     e.preventDefault()
     setError('')
 
-    if (!description || !amount) {
+    if (!description || !amount || !userId) {
       setError('Preencha todos os campos')
       return
     }
@@ -49,92 +59,250 @@ export default function TransactionForm({ userId, onSuccess }: TransactionFormPr
     } else {
       setDescription('')
       setAmount('')
-      setCategory(EXPENSE_CATEGORIES[0])
+      setCategory(type === 'expense' ? EXPENSE_CATEGORIES[0] : INCOME_CATEGORIES[0])
       setDate(new Date().toISOString().split('T')[0])
-      if (onSuccess) {
-        onSuccess()
-      }
-      router.refresh()
+      onTransactionAdded?.()
     }
 
     setLoading(false)
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-lg font-semibold mb-4">Adicionar Transação</h2>
+    <div style={{
+      background: colors.background.light,
+      borderRadius: borderRadius.xl,
+      boxShadow: shadows.md,
+      border: `1px solid ${colors.primary[100]}`,
+      padding: spacing.xl,
+      height: 'fit-content',
+    }}>
+      {/* Header */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: spacing.md,
+        marginBottom: spacing.lg,
+      }}>
+        <div style={{
+          width: '44px',
+          height: '44px',
+          background: colors.primary[100],
+          borderRadius: borderRadius.lg,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          <Plus size={24} color={colors.primary[600]} />
+        </div>
+        <h2 style={{
+          fontSize: typography.h4.fontSize,
+          fontWeight: 700,
+          color: colors.secondary[900],
+          margin: 0,
+        }}>
+          Adicionar Transação
+        </h2>
+      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Tipo</label>
-          <div className="flex gap-4">
-            <label className="flex items-center">
-              <input
-                type="radio"
-                value="expense"
-                checked={type === 'expense'}
-                onChange={(e) => {
-                  setType('expense')
-                  setCategory(EXPENSE_CATEGORIES[0])
-                }}
-                className="mr-2"
-              />
-              <span className="text-sm text-gray-700">Despesa</span>
-            </label>
-            <label className="flex items-center">
-              <input
-                type="radio"
-                value="income"
-                checked={type === 'income'}
-                onChange={(e) => {
-                  setType('income')
-                  setCategory(INCOME_CATEGORIES[0])
-                }}
-                className="mr-2"
-              />
-              <span className="text-sm text-gray-700">Receita</span>
-            </label>
+      <form onSubmit={handleSubmit}>
+        {/* Type Selection */}
+        <div style={{ marginBottom: spacing.lg }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: spacing.md,
+          }}>
+            {/* Despesa Button */}
+            <button
+              type="button"
+              onClick={() => {
+                setType('expense')
+                setCategory(EXPENSE_CATEGORIES[0])
+              }}
+              style={{
+                padding: `${spacing.md} ${spacing.md}`,
+                background: type === 'expense' ? colors.status.error + '20' : colors.secondary[100],
+                border: type === 'expense' ? `2px solid ${colors.status.error}` : `1px solid ${colors.secondary[200]}`,
+                borderRadius: borderRadius.lg,
+                color: type === 'expense' ? colors.status.error : colors.secondary[600],
+                fontWeight: 600,
+                fontSize: typography.body.fontSize,
+                cursor: 'pointer',
+                transition: transitions.normal,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: spacing.sm,
+              }}
+              onMouseEnter={(e) => {
+                if (type !== 'expense') {
+                  e.currentTarget.style.background = colors.secondary[200]
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (type !== 'expense') {
+                  e.currentTarget.style.background = colors.secondary[100]
+                }
+              }}
+            >
+              <ArrowDownLeft size={18} />
+              Despesa
+            </button>
+
+            {/* Receita Button */}
+            <button
+              type="button"
+              onClick={() => {
+                setType('income')
+                setCategory(INCOME_CATEGORIES[0])
+              }}
+              style={{
+                padding: `${spacing.md} ${spacing.md}`,
+                background: type === 'income' ? colors.status.success + '20' : colors.secondary[100],
+                border: type === 'income' ? `2px solid ${colors.status.success}` : `1px solid ${colors.secondary[200]}`,
+                borderRadius: borderRadius.lg,
+                color: type === 'income' ? colors.status.success : colors.secondary[600],
+                fontWeight: 600,
+                fontSize: typography.body.fontSize,
+                cursor: 'pointer',
+                transition: transitions.normal,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: spacing.sm,
+              }}
+              onMouseEnter={(e) => {
+                if (type !== 'income') {
+                  e.currentTarget.style.background = colors.secondary[200]
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (type !== 'income') {
+                  e.currentTarget.style.background = colors.secondary[100]
+                }
+              }}
+            >
+              <ArrowUpRight size={18} />
+              Receita
+            </button>
           </div>
         </div>
 
-        <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+        {/* Description Input */}
+        <div style={{ marginBottom: spacing.lg }}>
+          <label style={{
+            display: 'block',
+            fontSize: typography.label.fontSize,
+            fontWeight: 600,
+            color: colors.secondary[900],
+            marginBottom: spacing.sm,
+          }}>
             Descrição
           </label>
-          <input
-            type="text"
-            id="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Descreva a transação"
-          />
+          <div style={{ position: 'relative' }}>
+            <input
+              type="text"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder={type === 'expense' ? 'Ex: Café da manhã' : 'Ex: Salário mensal'}
+              style={{
+                width: '100%',
+                padding: `${spacing.md} ${spacing.md}`,
+                fontSize: typography.body.fontSize,
+                border: `1px solid ${colors.secondary[200]}`,
+                borderRadius: borderRadius.lg,
+                backgroundColor: colors.background.light,
+                fontFamily: 'inherit',
+                transition: transitions.normal,
+                boxSizing: 'border-box',
+              } as React.CSSProperties}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = colors.primary[500]
+                e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary[50]}`
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = colors.secondary[200]
+                e.currentTarget.style.boxShadow = 'none'
+              }}
+            />
+          </div>
         </div>
 
-        <div>
-          <label htmlFor="amount" className="block text-sm font-medium text-gray-700">
+        {/* Amount Input */}
+        <div style={{ marginBottom: spacing.lg }}>
+          <label style={{
+            display: 'block',
+            fontSize: typography.label.fontSize,
+            fontWeight: 600,
+            color: colors.secondary[900],
+            marginBottom: spacing.sm,
+          }}>
             Valor (R$)
           </label>
           <input
             type="number"
-            id="amount"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            step="0.01"
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             placeholder="0.00"
+            step="0.01"
+            min="0"
+            style={{
+              width: '100%',
+              padding: `${spacing.md} ${spacing.md}`,
+              fontSize: typography.body.fontSize,
+              border: `1px solid ${colors.secondary[200]}`,
+              borderRadius: borderRadius.lg,
+              backgroundColor: colors.background.light,
+              fontFamily: 'inherit',
+              transition: transitions.normal,
+              boxSizing: 'border-box',
+            } as React.CSSProperties}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = colors.primary[500]
+              e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary[50]}`
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = colors.secondary[200]
+              e.currentTarget.style.boxShadow = 'none'
+            }}
           />
         </div>
 
-        <div>
-          <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+        {/* Category Select */}
+        <div style={{ marginBottom: spacing.lg }}>
+          <label style={{
+            display: 'block',
+            fontSize: typography.label.fontSize,
+            fontWeight: 600,
+            color: colors.secondary[900],
+            marginBottom: spacing.sm,
+          }}>
             Categoria
           </label>
           <select
-            id="category"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            style={{
+              width: '100%',
+              padding: `${spacing.md} ${spacing.md}`,
+              fontSize: typography.body.fontSize,
+              border: `1px solid ${colors.secondary[200]}`,
+              borderRadius: borderRadius.lg,
+              backgroundColor: colors.background.light,
+              color: colors.secondary[900],
+              fontFamily: 'inherit',
+              transition: transitions.normal,
+              cursor: 'pointer',
+              boxSizing: 'border-box',
+            } as React.CSSProperties}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = colors.primary[500]
+              e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary[50]}`
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = colors.secondary[200]
+              e.currentTarget.style.boxShadow = 'none'
+            }}
           >
             {categories.map((cat) => (
               <option key={cat} value={cat}>
@@ -144,29 +312,93 @@ export default function TransactionForm({ userId, onSuccess }: TransactionFormPr
           </select>
         </div>
 
-        <div>
-          <label htmlFor="date" className="block text-sm font-medium text-gray-700">
+        {/* Date Input */}
+        <div style={{ marginBottom: spacing.lg }}>
+          <label style={{
+            display: 'block',
+            fontSize: typography.label.fontSize,
+            fontWeight: 600,
+            color: colors.secondary[900],
+            marginBottom: spacing.sm,
+          }}>
             Data
           </label>
           <input
             type="date"
-            id="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            style={{
+              width: '100%',
+              padding: `${spacing.md} ${spacing.md}`,
+              fontSize: typography.body.fontSize,
+              border: `1px solid ${colors.secondary[200]}`,
+              borderRadius: borderRadius.lg,
+              backgroundColor: colors.background.light,
+              color: colors.secondary[900],
+              fontFamily: 'inherit',
+              transition: transitions.normal,
+              cursor: 'pointer',
+              boxSizing: 'border-box',
+            } as React.CSSProperties}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = colors.primary[500]
+              e.currentTarget.style.boxShadow = `0 0 0 3px ${colors.primary[50]}`
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = colors.secondary[200]
+              e.currentTarget.style.boxShadow = 'none'
+            }}
           />
         </div>
 
+        {/* Error Message */}
         {error && (
-          <div className="rounded-md bg-red-50 p-4">
-            <p className="text-sm text-red-800">{error}</p>
+          <div style={{
+            background: colors.status.error + '15',
+            border: `1px solid ${colors.status.error}`,
+            borderRadius: borderRadius.lg,
+            padding: spacing.md,
+            marginBottom: spacing.lg,
+            color: colors.status.error,
+            fontSize: typography.small.fontSize,
+            fontWeight: 500,
+          }}>
+            {error}
           </div>
         )}
 
+        {/* Submit Button */}
         <button
           type="submit"
           disabled={loading}
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+          style={{
+            width: '100%',
+            padding: `${spacing.md} ${spacing.lg}`,
+            background: loading
+              ? colors.secondary[300]
+              : `linear-gradient(135deg, ${colors.primary[500]} 0%, ${colors.primary[600]} 100%)`,
+            color: colors.background.light,
+            border: 'none',
+            borderRadius: borderRadius.lg,
+            fontSize: typography.label.fontSize,
+            fontWeight: 600,
+            cursor: loading ? 'not-allowed' : 'pointer',
+            transition: transitions.normal,
+            boxShadow: loading ? 'none' : shadows.blue,
+            opacity: loading ? 0.6 : 1,
+          }}
+          onMouseEnter={(e) => {
+            if (!loading) {
+              e.currentTarget.style.boxShadow = shadows.lg
+              e.currentTarget.style.transform = 'translateY(-2px)'
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!loading) {
+              e.currentTarget.style.boxShadow = shadows.blue
+              e.currentTarget.style.transform = 'translateY(0)'
+            }
+          }}
         >
           {loading ? 'Adicionando...' : 'Adicionar Transação'}
         </button>

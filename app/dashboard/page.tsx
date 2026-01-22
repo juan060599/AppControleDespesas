@@ -4,10 +4,15 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getCurrentUser, getTransactions, signOut } from '@/lib/database'
 import Dashboard from '@/components/Dashboard'
+import DashboardHeader from '@/components/DashboardHeader'
 import TransactionForm from '@/components/TransactionForm'
 import TransactionList from '@/components/TransactionList'
+import BankStatementUpload from '@/components/BankStatementUpload'
+import SpendingAlerts from '@/components/SpendingAlerts'
+import SpendingSuggestions from '@/components/SpendingSuggestions'
+import SpendingPlanning from '@/components/SpendingPlanning'
 import { Transaction } from '@/lib/database'
-import { LogOut } from 'lucide-react'
+import { colors, spacing } from '@/lib/designSystem'
 
 export default function DashboardPage() {
   const [user, setUser] = useState<any>(null)
@@ -57,10 +62,36 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <p className="text-gray-600">Carregando...</p>
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: colors.background.gradient,
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            width: '50px',
+            height: '50px',
+            border: `3px solid ${colors.primary[200]}`,
+            borderTop: `3px solid ${colors.primary[500]}`,
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 16px',
+          }}></div>
+          <p style={{
+            fontSize: '16px',
+            color: colors.secondary[600],
+            fontWeight: 500,
+          }}>
+            Carregando seus dados...
+          </p>
         </div>
+        <style>{`
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
       </div>
     )
   }
@@ -70,72 +101,77 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">Controle de Despesas</h1>
-          <div className="flex items-center gap-4">
-            <p className="text-sm text-gray-600">Bem-vindo, {user.email}</p>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md"
-            >
-              <LogOut size={18} />
-              Sair
-            </button>
-          </div>
-        </div>
-      </header>
+    <div style={{
+      minHeight: '100vh',
+      background: colors.background.lighter,
+    }}>
+      <DashboardHeader userName={user.email || 'Usuário'} onLogout={handleLogout} />
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="space-y-8">
-          {/* Dashboard Section */}
-          <section>
-            <Dashboard transactions={transactions} />
-          </section>
+      <main style={{
+        maxWidth: '1400px',
+        margin: '0 auto',
+        padding: spacing.xl,
+      }}>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 380px',
+          gap: spacing.xl,
+          alignItems: 'start',
+        }}>
+          {/* Left Column - Main Dashboard */}
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: spacing.xl,
+          }}>
+            {/* Dashboard Section */}
+            <section>
+              <Dashboard transactions={transactions} />
+            </section>
 
-          {/* Transaction Form */}
-          <section>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <TransactionForm userId={user.id} onSuccess={handleTransactionAdded} />
+            {/* Bank Statement Upload Section */}
+            <section>
+              <BankStatementUpload onTransactionsAdded={handleTransactionAdded} />
+            </section>
 
-              {/* Quick Stats */}
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-semibold mb-4">Informações Úteis</h3>
-                <div className="space-y-4 text-sm text-gray-600">
-                  <div>
-                    <p className="font-medium text-gray-900">Total de Transações</p>
-                    <p className="text-2xl font-bold text-blue-600">{transactions.length}</p>
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-900">Receitas</p>
-                    <p className="text-xl font-bold text-green-600">
-                      R$ {transactions
-                        .filter((t) => t.type === 'income')
-                        .reduce((sum, t) => sum + t.amount, 0)
-                        .toFixed(2)}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-900">Despesas</p>
-                    <p className="text-xl font-bold text-red-600">
-                      R$ {transactions
-                        .filter((t) => t.type === 'expense')
-                        .reduce((sum, t) => sum + t.amount, 0)
-                        .toFixed(2)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
+            {/* Spending Planning Section */}
+            <section>
+              <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: spacing.md as any, color: colors.secondary[900] }}>
+                📊 Planejamento de Gastos
+              </h2>
+              <SpendingPlanning transactions={transactions} />
+            </section>
 
-          {/* Transaction List */}
-          <section>
-            <TransactionList transactions={transactions} />
-          </section>
+            {/* Spending Alerts Section */}
+            <section>
+              <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: spacing.md as any, color: colors.secondary[900] }}>
+                ⚠️ Avisos e Alertas
+              </h2>
+              <SpendingAlerts transactions={transactions} />
+            </section>
+
+            {/* Spending Suggestions Section */}
+            <section>
+              <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: spacing.md as any, color: colors.secondary[900] }}>
+                💡 Sugestões de Economia
+              </h2>
+              <SpendingSuggestions transactions={transactions} />
+            </section>
+
+            {/* Transactions List Section */}
+            <section>
+              <TransactionList transactions={transactions} />
+            </section>
+          </div>
+
+          {/* Right Column - Transaction Form */}
+          <div style={{
+            position: 'sticky',
+            top: `calc(64px + ${spacing.xl})`,
+          }}>
+            <TransactionForm onTransactionAdded={handleTransactionAdded} />
+          </div>
         </div>
       </main>
     </div>

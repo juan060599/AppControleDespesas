@@ -1,36 +1,23 @@
 'use client'
 
-import { Transaction, deleteTransaction, updateTransaction } from '@/lib/database'
+import { Transaction, deleteTransaction } from '@/lib/database'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Trash2, Edit2 } from 'lucide-react'
+import { colors, spacing, typography, shadows, borderRadius, transitions } from '@/lib/designSystem'
+import { Trash2, ArrowUpRight, ArrowDownLeft, Calendar, Tag } from 'lucide-react'
 
 interface TransactionListProps {
   transactions: Transaction[]
 }
 
 export default function TransactionList({ transactions }: TransactionListProps) {
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [editValues, setEditValues] = useState<Partial<Transaction>>({})
-  const router = useRouter()
+  const [deleteLoading, setDeleteLoading] = useState<string | null>(null)
 
   const handleDelete = async (id: string) => {
     if (confirm('Tem certeza que deseja deletar esta transação?')) {
+      setDeleteLoading(id)
       await deleteTransaction(id)
-      router.refresh()
-    }
-  }
-
-  const handleEdit = (transaction: Transaction) => {
-    setEditingId(transaction.id)
-    setEditValues(transaction)
-  }
-
-  const handleSave = async () => {
-    if (editingId) {
-      await updateTransaction(editingId, editValues)
-      setEditingId(null)
-      router.refresh()
+      setDeleteLoading(null)
+      window.location.reload()
     }
   }
 
@@ -46,111 +33,200 @@ export default function TransactionList({ transactions }: TransactionListProps) 
   }
 
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
-      <div className="px-6 py-4 border-b border-gray-200">
-        <h2 className="text-lg font-semibold">Transações Recentes</h2>
+    <div style={{
+      background: colors.background.light,
+      borderRadius: borderRadius.xl,
+      boxShadow: shadows.md,
+      border: `1px solid ${colors.primary[100]}`,
+      overflow: 'hidden',
+    }}>
+      {/* Header */}
+      <div style={{
+        padding: `${spacing.lg} ${spacing.xl}`,
+        borderBottom: `1px solid ${colors.primary[100]}`,
+        display: 'flex',
+        alignItems: 'center',
+        gap: spacing.md,
+      }}>
+        <div style={{
+          width: '44px',
+          height: '44px',
+          background: colors.primary[100],
+          borderRadius: borderRadius.lg,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          <Calendar size={24} color={colors.primary[600]} />
+        </div>
+        <h2 style={{
+          fontSize: typography.h3.fontSize,
+          fontWeight: 700,
+          color: colors.secondary[900],
+          margin: 0,
+        }}>
+          Transações Recentes
+        </h2>
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Descrição</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Categoria</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Valor</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ações</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {transactions.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
-                  Nenhuma transação registrada
-                </td>
-              </tr>
-            ) : (
-              transactions.map((transaction) => (
-                <tr key={transaction.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                    {formatDate(transaction.date)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                    {editingId === transaction.id ? (
-                      <input
-                        type="text"
-                        value={editValues.description || ''}
-                        onChange={(e) =>
-                          setEditValues({ ...editValues, description: e.target.value })
-                        }
-                        className="px-2 py-1 border border-gray-300 rounded-md text-sm"
-                      />
+
+      {/* List */}
+      <div>
+        {transactions.length === 0 ? (
+          <div style={{
+            padding: spacing.xxl,
+            textAlign: 'center',
+            color: colors.secondary[400],
+          }}>
+            <p style={{
+              fontSize: typography.body.fontSize,
+              margin: 0,
+            }}>
+              Nenhuma transação registrada
+            </p>
+          </div>
+        ) : (
+          <div>
+            {transactions.map((transaction, index) => (
+              <div
+                key={transaction.id}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: spacing.lg,
+                  borderBottom: index < transactions.length - 1 ? `1px solid ${colors.secondary[100]}` : 'none',
+                  transition: transitions.normal,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = colors.secondary[50]
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = colors.background.light
+                }}
+              >
+                {/* Left Side - Icon and Details */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: spacing.lg,
+                  flex: 1,
+                }}>
+                  {/* Icon */}
+                  <div style={{
+                    width: '48px',
+                    height: '48px',
+                    background: transaction.type === 'income' ? colors.status.success + '20' : colors.status.error + '20',
+                    borderRadius: borderRadius.lg,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}>
+                    {transaction.type === 'income' ? (
+                      <ArrowUpRight size={24} color={colors.status.success} />
                     ) : (
-                      transaction.description
+                      <ArrowDownLeft size={24} color={colors.status.error} />
                     )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                    {transaction.category}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        transaction.type === 'income'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}
-                    >
-                      {transaction.type === 'income' ? 'Receita' : 'Despesa'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <span
-                      className={
-                        transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
+                  </div>
+
+                  {/* Details */}
+                  <div style={{ flex: 1 }}>
+                    <p style={{
+                      fontSize: typography.body.fontSize,
+                      fontWeight: 600,
+                      color: colors.secondary[900],
+                      margin: 0,
+                      marginBottom: spacing.xs,
+                    }}>
+                      {transaction.description}
+                    </p>
+                    <div style={{
+                      display: 'flex',
+                      gap: spacing.md,
+                      alignItems: 'center',
+                    }}>
+                      <span style={{
+                        fontSize: typography.small.fontSize,
+                        color: colors.secondary[500],
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: spacing.xs,
+                      }}>
+                        <Tag size={14} />
+                        {transaction.category}
+                      </span>
+                      <span style={{
+                        fontSize: typography.small.fontSize,
+                        color: colors.secondary[500],
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: spacing.xs,
+                      }}>
+                        <Calendar size={14} />
+                        {formatDate(transaction.date)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Side - Amount and Action */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: spacing.lg,
+                  marginLeft: spacing.lg,
+                }}>
+                  {/* Amount */}
+                  <div style={{ textAlign: 'right', minWidth: '120px' }}>
+                    <p style={{
+                      fontSize: '18px',
+                      fontWeight: 700,
+                      color: transaction.type === 'income' ? colors.status.success : colors.status.error,
+                      margin: 0,
+                    }}>
+                      {transaction.type === 'income' ? '+' : '-'} {formatCurrency(transaction.amount)}
+                    </p>
+                  </div>
+
+                  {/* Delete Button */}
+                  <button
+                    onClick={() => handleDelete(transaction.id)}
+                    disabled={deleteLoading === transaction.id}
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      background: colors.status.error + '15',
+                      border: `1px solid ${colors.status.error}20`,
+                      borderRadius: borderRadius.lg,
+                      color: colors.status.error,
+                      cursor: deleteLoading === transaction.id ? 'not-allowed' : 'pointer',
+                      transition: transitions.normal,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                      opacity: deleteLoading === transaction.id ? 0.6 : 1,
+                    }}
+                    onMouseEnter={(e) => {
+                      if (deleteLoading !== transaction.id) {
+                        e.currentTarget.style.background = colors.status.error + '25'
+                        e.currentTarget.style.borderColor = colors.status.error + '40'
                       }
-                    >
-                      {transaction.type === 'income' ? '+' : '-'}
-                      {formatCurrency(transaction.amount)}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm space-x-2">
-                    {editingId === transaction.id ? (
-                      <>
-                        <button
-                          onClick={handleSave}
-                          className="text-blue-600 hover:text-blue-900 font-medium text-xs"
-                        >
-                          Salvar
-                        </button>
-                        <button
-                          onClick={() => setEditingId(null)}
-                          className="text-gray-600 hover:text-gray-900 font-medium text-xs"
-                        >
-                          Cancelar
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button
-                          onClick={() => handleEdit(transaction)}
-                          className="text-blue-600 hover:text-blue-900 inline-flex items-center gap-1"
-                        >
-                          <Edit2 size={16} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(transaction.id)}
-                          className="text-red-600 hover:text-red-900 inline-flex items-center gap-1"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </>
-                    )}
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+                    }}
+                    onMouseLeave={(e) => {
+                      if (deleteLoading !== transaction.id) {
+                        e.currentTarget.style.background = colors.status.error + '15'
+                        e.currentTarget.style.borderColor = colors.status.error + '20'
+                      }
+                    }}
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

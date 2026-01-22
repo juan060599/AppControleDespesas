@@ -1,0 +1,599 @@
+'use client'
+
+import { useState } from 'react'
+import { colors, spacing, typography, shadows, borderRadius, transitions } from '@/lib/designSystem'
+import { Upload, FileText, Loader, CheckCircle, AlertCircle, Trash2 } from 'lucide-react'
+import { parseCSV, parseOFX } from '@/lib/aiAnalysis'
+import { addTransaction, getCurrentUser } from '@/lib/database'
+
+interface BankStatementUploadProps {
+  onTransactionsAdded?: () => void
+}
+
+interface ParsedTransaction {
+  description: string
+  amount: number
+  type: 'income' | 'expense'
+  category: string
+  date: string
+}
+
+export default function BankStatementUpload({ onTransactionsAdded }: BankStatementUploadProps) {
+  const [file, setFile] = useState<File | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [analyzing, setAnalyzing] = useState(false)
+  const [transactions, setTransactions] = useState<ParsedTransaction[]>([])
+  const [inserting, setInserting] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+  const [selectedTransactions, setSelectedTransactions] = useState<Set<number>>(new Set())
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0]
+    if (selectedFile) {
+      setFile(selectedFile)
+      setError('')
+      setSuccess('')
+      setTransactions([])
+    }
+  }
+
+  const handleAnalyze = async () => {
+    if (!file) {
+      setError('Selecione um arquivo primeiro')
+      return
+    }
+
+    setLoading(true)
+    setAnalyzing(true)
+    setError('')
+
+    try {
+      const fileContent = await file.text()
+      
+      // Validate file type
+      const fileName = file.name.toLowerCase()
+      const isCSV = fileName.endsWith('.csv')
+      const isOFX = fileName.endsWith('.ofx') || fileName.endsWith('.txt')
+      const isPDF = fileName.endsWith('.pdf')
+
+      if (!isCSV && !isOFX && !isPDF) {
+        setError('Arquivo deve ser CSV, OFX ou PDF')
+        setLoading(false)
+        setAnalyzing(false)
+        return
+      }
+
+      // Parse and prepare content
+      let textToAnalyze = fileContent
+
+      if (isCSV) {
+        const parsed = parseCSV(fileContent)
+        textToAnalyze = parsed.map((row) => row.join(' | ')).join('\n')
+      } else if (isOFX) {
+        textToAnalyze = parseOFX(fileContent)
+      }
+
+      // Call Gemini API route to analyze
+      const response = await fetch('/api/analyze-gemini', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ fileContent: textToAnalyze }),
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'Erro ao analisar com IA')
+      }
+
+      const data = await response.json()
+      const parsedTransactions = data.transactions
+
+      if (parsedTransactions.length === 0) {
+        setError('Nenhuma transação encontrada no arquivo')
+        setLoading(false)
+        setAnalyzing(false)
+        return
+      }
+
+      setTransactions(parsedTransactions)
+      setSelectedTransactions(new Set(Array.from({ length: parsedTransactions.length }, (_, i) => i)))
+      setSuccess(`${parsedTransactions.length} transações encontradas!`)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao analisar arquivo')
+      console.error(err)
+    } finally {
+      setLoading(false)
+      setAnalyzing(false)
+    }
+  }
+
+  const handleInsertTransactions = async () => {
+    if (selectedTransactions.size === 0) {
+      setError('Selecione pelo menos uma transação')
+      return
+    }
+
+    setInserting(true)
+    setError('')
+
+    try {
+      const user = await getCurrentUser()
+      if (!user) {
+        setError('Usuário não autenticado')
+        setInserting(false)
+        return
+      }
+
+      let inserted = 0
+      let failed = 0
+
+      // Insert selected transactions
+      for (const index of Array.from(selectedTransactions)) {
+        const tx = transactions[index]
+
+        try {
+          const { error: addError } = await addTransaction({
+            user_id: user.id,
+            description: tx.description,
+            amount: tx.amount,
+            type: tx.type,
+            category: tx.category,
+            date: tx.date,
+          })
+
+          if (addError) {
+            failed++
+            console.error(`Erro inserindo transação: ${tx.description}`, addError)
+          } else {
+            inserted++
+          }
+        } catch (err) {
+          failed++
+          console.error(`Erro ao inserir: ${tx.description}`, err)
+        }
+      }
+
+      setSuccess(
+        `✅ ${inserted} transações inseridas com sucesso!${failed > 0 ? ` (${failed} falharam)` : ''}`
+      )
+
+      // Reset form
+      setTimeout(() => {
+        setFile(null)
+        setTransactions([])
+        setSelectedTransactions(new Set())
+        onTransactionsAdded?.()
+      }, 2000)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao inserir transações')
+    } finally {
+      setInserting(false)
+    }
+  }
+
+  const toggleTransaction = (index: number) => {
+    const newSet = new Set(selectedTransactions)
+    if (newSet.has(index)) {
+      newSet.delete(index)
+    } else {
+      newSet.add(index)
+    }
+    setSelectedTransactions(newSet)
+  }
+
+  const toggleAll = () => {
+    if (selectedTransactions.size === transactions.length) {
+      setSelectedTransactions(new Set())
+    } else {
+      setSelectedTransactions(new Set(Array.from({ length: transactions.length }, (_, i) => i)))
+    }
+  }
+
+  return (
+    <div
+      style={{
+        background: colors.background.light,
+        borderRadius: borderRadius.xl,
+        boxShadow: shadows.md,
+        border: `1px solid ${colors.primary[100]}`,
+        padding: spacing.xl,
+      }}
+    >
+      {/* Header */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: spacing.md,
+          marginBottom: spacing.lg,
+        }}
+      >
+        <div
+          style={{
+            width: '44px',
+            height: '44px',
+            background: colors.primary[100],
+            borderRadius: borderRadius.lg,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Upload size={24} color={colors.primary[600]} />
+        </div>
+        <div>
+          <h2
+            style={{
+              fontSize: typography.h4.fontSize,
+              fontWeight: 700,
+              color: colors.secondary[900],
+              margin: 0,
+            }}
+          >
+            Importar Extrato Bancário
+          </h2>
+          <p
+            style={{
+              fontSize: typography.small.fontSize,
+              color: colors.secondary[500],
+              margin: '4px 0 0 0',
+            }}
+          >
+            IA analisa e lança automaticamente
+          </p>
+        </div>
+      </div>
+
+      {/* File Upload */}
+      {transactions.length === 0 && (
+        <div
+          style={{
+            marginBottom: spacing.lg,
+          }}
+        >
+          <label
+            style={{
+              display: 'block',
+              padding: spacing.xl,
+              border: `2px dashed ${colors.primary[300]}`,
+              borderRadius: borderRadius.lg,
+              textAlign: 'center',
+              cursor: 'pointer',
+              transition: transitions.normal,
+              background: colors.primary[50],
+            }}
+            onDragOver={(e) => {
+              e.preventDefault()
+              e.currentTarget.style.background = colors.primary[100]
+              e.currentTarget.style.borderColor = colors.primary[500]
+            }}
+            onDragLeave={(e) => {
+              e.currentTarget.style.background = colors.primary[50]
+              e.currentTarget.style.borderColor = colors.primary[300]
+            }}
+            onDrop={(e) => {
+              e.preventDefault()
+              e.currentTarget.style.background = colors.primary[50]
+              e.currentTarget.style.borderColor = colors.primary[300]
+              const droppedFile = e.dataTransfer.files?.[0]
+              if (droppedFile) {
+                setFile(droppedFile)
+                setError('')
+              }
+            }}
+          >
+            <FileText size={32} color={colors.primary[500]} style={{ margin: '0 auto 12px' }} />
+            <p
+              style={{
+                fontSize: typography.body.fontSize,
+                fontWeight: 600,
+                color: colors.secondary[900],
+                margin: '0 0 4px 0',
+              }}
+            >
+              {file ? file.name : 'Arrastar ou clicar para selecionar'}
+            </p>
+            <p
+              style={{
+                fontSize: typography.small.fontSize,
+                color: colors.secondary[500],
+                margin: 0,
+              }}
+            >
+              CSV, OFX ou PDF do seu banco
+            </p>
+            <input
+              type="file"
+              accept=".csv,.ofx,.txt,.pdf"
+              onChange={handleFileSelect}
+              style={{ display: 'none' }}
+            />
+          </label>
+
+          {file && (
+            <div
+              style={{
+                display: 'flex',
+                gap: spacing.md,
+                marginTop: spacing.lg,
+              }}
+            >
+              <button
+                onClick={handleAnalyze}
+                disabled={loading || !file}
+                style={{
+                  flex: 1,
+                  padding: `${spacing.md} ${spacing.lg}`,
+                  background: loading
+                    ? colors.secondary[300]
+                    : `linear-gradient(135deg, ${colors.primary[500]} 0%, ${colors.primary[600]} 100%)`,
+                  color: colors.background.light,
+                  border: 'none',
+                  borderRadius: borderRadius.lg,
+                  fontSize: typography.label.fontSize,
+                  fontWeight: 600,
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  transition: transitions.normal,
+                  boxShadow: loading ? 'none' : shadows.blue,
+                  opacity: loading ? 0.6 : 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: spacing.sm,
+                }}
+              >
+                {loading && <Loader size={18} style={{ animation: 'spin 1s linear infinite' }} />}
+                {loading ? 'Analisando...' : 'Analisar com IA'}
+              </button>
+
+              <button
+                onClick={() => {
+                  setFile(null)
+                  setError('')
+                  setSuccess('')
+                }}
+                style={{
+                  padding: `${spacing.md} ${spacing.lg}`,
+                  background: colors.secondary[100],
+                  color: colors.secondary[600],
+                  border: `1px solid ${colors.secondary[200]}`,
+                  borderRadius: borderRadius.lg,
+                  fontSize: typography.label.fontSize,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: transitions.normal,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = colors.secondary[200]
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = colors.secondary[100]
+                }}
+              >
+                Limpar
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Error Message */}
+      {error && (
+        <div
+          style={{
+            background: colors.status.error + '15',
+            border: `1px solid ${colors.status.error}`,
+            borderRadius: borderRadius.lg,
+            padding: spacing.md,
+            marginBottom: spacing.lg,
+            color: colors.status.error,
+            fontSize: typography.small.fontSize,
+            fontWeight: 500,
+            display: 'flex',
+            alignItems: 'center',
+            gap: spacing.sm,
+          }}
+        >
+          <AlertCircle size={18} />
+          {error}
+        </div>
+      )}
+
+      {/* Success Message */}
+      {success && transactions.length > 0 && (
+        <div
+          style={{
+            background: colors.status.success + '15',
+            border: `1px solid ${colors.status.success}`,
+            borderRadius: borderRadius.lg,
+            padding: spacing.md,
+            marginBottom: spacing.lg,
+            color: colors.status.success,
+            fontSize: typography.small.fontSize,
+            fontWeight: 500,
+            display: 'flex',
+            alignItems: 'center',
+            gap: spacing.sm,
+          }}
+        >
+          <CheckCircle size={18} />
+          {success}
+        </div>
+      )}
+
+      {/* Transactions List */}
+      {transactions.length > 0 && (
+        <div>
+          {/* Select All */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: spacing.md,
+              padding: spacing.md,
+              background: colors.secondary[50],
+              borderRadius: borderRadius.lg,
+              marginBottom: spacing.lg,
+              cursor: 'pointer',
+            }}
+            onClick={() => toggleAll()}
+          >
+            <input
+              type="checkbox"
+              checked={selectedTransactions.size === transactions.length}
+              onChange={() => {}}
+              style={{
+                width: '18px',
+                height: '18px',
+                cursor: 'pointer',
+              }}
+            />
+            <span
+              style={{
+                fontSize: typography.label.fontSize,
+                fontWeight: 600,
+                color: colors.secondary[900],
+              }}
+            >
+              {selectedTransactions.size === transactions.length
+                ? 'Desselecionar Tudo'
+                : `Selecionar Tudo (${transactions.length})`}
+            </span>
+          </div>
+
+          {/* Transactions */}
+          <div
+            style={{
+              maxHeight: '400px',
+              overflowY: 'auto',
+              marginBottom: spacing.lg,
+              border: `1px solid ${colors.secondary[200]}`,
+              borderRadius: borderRadius.lg,
+            }}
+          >
+            {transactions.map((tx, index) => (
+              <div
+                key={index}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: spacing.md,
+                  borderBottom: index < transactions.length - 1 ? `1px solid ${colors.secondary[100]}` : 'none',
+                  background: selectedTransactions.has(index) ? colors.primary[50] : colors.background.light,
+                  cursor: 'pointer',
+                  transition: transitions.normal,
+                }}
+                onClick={() => toggleTransaction(index)}
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedTransactions.has(index)}
+                  onChange={() => {}}
+                  style={{
+                    width: '18px',
+                    height: '18px',
+                    marginRight: spacing.md,
+                    cursor: 'pointer',
+                  }}
+                />
+
+                <div style={{ flex: 1 }}>
+                  <p
+                    style={{
+                      fontSize: typography.small.fontSize,
+                      fontWeight: 600,
+                      color: colors.secondary[900],
+                      margin: '0 0 4px 0',
+                    }}
+                  >
+                    {tx.description}
+                  </p>
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: spacing.md,
+                      fontSize: typography.small.fontSize,
+                      color: colors.secondary[500],
+                    }}
+                  >
+                    <span>{tx.date}</span>
+                    <span>•</span>
+                    <span>{tx.category}</span>
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    textAlign: 'right',
+                    minWidth: '100px',
+                  }}
+                >
+                  <p
+                    style={{
+                      fontSize: '16px',
+                      fontWeight: 700,
+                      color: tx.type === 'income' ? colors.status.success : colors.status.error,
+                      margin: 0,
+                    }}
+                  >
+                    {tx.type === 'income' ? '+' : '-'} R$ {tx.amount.toFixed(2)}
+                  </p>
+                  <p
+                    style={{
+                      fontSize: '11px',
+                      color: colors.secondary[400],
+                      margin: '2px 0 0 0',
+                      textTransform: 'capitalize',
+                    }}
+                  >
+                    {tx.type === 'income' ? 'Receita' : 'Despesa'}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Insert Button */}
+          <button
+            onClick={handleInsertTransactions}
+            disabled={inserting || selectedTransactions.size === 0}
+            style={{
+              width: '100%',
+              padding: `${spacing.md} ${spacing.lg}`,
+              background: inserting
+                ? colors.secondary[300]
+                : `linear-gradient(135deg, ${colors.status.success} 0%, ${colors.status.success}dd 100%)`,
+              color: colors.background.light,
+              border: 'none',
+              borderRadius: borderRadius.lg,
+              fontSize: typography.label.fontSize,
+              fontWeight: 600,
+              cursor: inserting || selectedTransactions.size === 0 ? 'not-allowed' : 'pointer',
+              transition: transitions.normal,
+              boxShadow: inserting ? 'none' : shadows.blue,
+              opacity: inserting || selectedTransactions.size === 0 ? 0.6 : 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: spacing.sm,
+            }}
+          >
+            {inserting && <Loader size={18} style={{ animation: 'spin 1s linear infinite' }} />}
+            {inserting
+              ? 'Inserindo...'
+              : `Lançar ${selectedTransactions.size} Transações`}
+          </button>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
+    </div>
+  )
+}
