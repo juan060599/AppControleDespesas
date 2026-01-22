@@ -125,6 +125,36 @@ export default function DashboardHeader({ userName, onLogout }: DashboardHeaderP
             </div>
           </div>
 
+          {/* Pricing Button */}
+          <Link href="/pricing" style={{ textDecoration: 'none' }}>
+            <button
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: spacing.sm,
+                padding: `10px ${spacing.md}`,
+                background: `linear-gradient(135deg, ${colors.primary[500]} 0%, ${colors.primary[600]} 100%)`,
+                border: 'none',
+                borderRadius: borderRadius.lg,
+                color: 'white',
+                fontSize: '14px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: transitions.normal,
+              }}
+              onMouseEnter={(e) => {
+                ;(e.target as HTMLButtonElement).style.transform = 'translateY(-2px)'
+                ;(e.target as HTMLButtonElement).style.boxShadow = shadows.lg
+              }}
+              onMouseLeave={(e) => {
+                ;(e.target as HTMLButtonElement).style.transform = 'translateY(0)'
+                ;(e.target as HTMLButtonElement).style.boxShadow = 'none'
+              }}
+            >
+              💳 Planos
+            </button>
+          </Link>
+
           {/* Settings Button */}
           <Link href="/settings" style={{ textDecoration: 'none' }}>
             <button

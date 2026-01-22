@@ -8,7 +8,6 @@ export default function ApiKeySettings() {
   const [apiKey, setApiKey] = useState('')
   const [showKey, setShowKey] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [testing, setTesting] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null)
   const [isConfigured, setIsConfigured] = useState(false)
 
@@ -48,51 +47,6 @@ export default function ApiKeySettings() {
       setMessage({ type: 'error', text: 'Erro ao salvar chave' })
     } finally {
       setLoading(false)
-    }
-  }
-
-  const handleTest = async () => {
-    if (!apiKey.trim() || apiKey.includes('...')) {
-      setMessage({ type: 'error', text: 'Por favor, insira a chave completa para testar' })
-      return
-    }
-
-    setTesting(true)
-    try {
-      const response = await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=' + apiKey, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: 'Test',
-                },
-              ],
-            },
-          ],
-        }),
-      })
-
-      if (response.ok) {
-        setMessage({ type: 'success', text: '✅ Chave válida e funcionando!' })
-      } else {
-        const error = await response.json()
-        setMessage({
-          type: 'error',
-          text: `❌ Erro: ${error.error?.message || 'Chave inválida'}`,
-        })
-      }
-    } catch (error) {
-      setMessage({
-        type: 'error',
-        text: `❌ Erro de conexão: ${error instanceof Error ? error.message : 'Erro desconhecido'}`,
-      })
-    } finally {
-      setTesting(false)
     }
   }
 
@@ -241,13 +195,13 @@ export default function ApiKeySettings() {
         </div>
       )}
 
-      {/* Botões */}
-      <div style={{ display: 'flex', gap: spacing.md, marginBottom: spacing.lg }}>
+      {/* Botão Salvar */}
+      <div style={{ marginBottom: spacing.lg }}>
         <button
           onClick={handleSave}
           disabled={loading || (isConfigured && apiKey.includes('...'))}
           style={{
-            flex: 1,
+            width: '100%',
             padding: `${spacing.sm} ${spacing.md}`,
             backgroundColor: colors.primary[500],
             color: 'white',
@@ -273,35 +227,6 @@ export default function ApiKeySettings() {
         >
           {loading && <Loader size={18} style={{ animation: 'spin 1s linear infinite' }} />}
           {loading ? 'Salvando...' : isConfigured && apiKey.includes('...') ? '✅ Salvo' : 'Salvar Chave'}
-        </button>
-
-        <button
-          onClick={handleTest}
-          disabled={testing || !apiKey}
-          style={{
-            flex: 1,
-            padding: `${spacing.sm} ${spacing.md}`,
-            backgroundColor: colors.status.success,
-            color: 'white',
-            border: 'none',
-            borderRadius: borderRadius.md,
-            fontWeight: 'bold',
-            cursor: testing || !apiKey ? 'not-allowed' : 'pointer',
-            opacity: testing || !apiKey ? 0.6 : 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: spacing.sm,
-            transition: transitions.default,
-          }}
-          onMouseEnter={(e) => {
-            if (!testing && apiKey) {
-              ;(e.target as HTMLButtonElement).style.backgroundColor = colors.status.success
-            }
-          }}
-        >
-          {testing && <Loader size={18} style={{ animation: 'spin 1s linear infinite' }} />}
-          {testing ? 'Testando...' : 'Testar Chave'}
         </button>
       </div>
 

@@ -26,6 +26,15 @@ export interface Budget {
   created_at: string
 }
 
+export interface AnalysisUsage {
+  id: string
+  user_id: string
+  month: string // YYYY-MM format
+  usage_count: number
+  created_at: string
+  updated_at: string
+}
+
 // Auth functions
 export async function signUp(email: string, password: string, name: string) {
   const { data, error } = await supabase.auth.signUp({
@@ -133,4 +142,74 @@ export async function deleteBudget(id: string) {
     .delete()
     .eq('id', id)
   return { error }
+}
+// Analysis Usage functions
+export async function getAnalysisUsage(userId: string, month: string) {
+  const { data, error } = await supabase
+    .from('analysis_usage')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('month', month)
+    .single()
+  return { data, error }
+}
+
+export async function incrementAnalysisUsage(userId: string, month: string) {
+  // First try to get existing record
+  const { data: existing, error: getError } = await supabase
+    .from('analysis_usage')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('month', month)
+    .single()
+
+  if (getError && getError.code === 'PGRST116') {
+    // Record doesn't exist, create it
+    const { data, error } = await supabase
+      .from('analysis_usage')
+      .insert([
+        {
+          user_id: userId,
+          month: month,
+          usage_count: 1,
+        },
+      ])
+      .select()
+    return { data, error }
+  }
+
+  if (getError) return { data: null, error: getError }
+
+  // Record exists, increment it
+  const { data, error } = await supabase
+    .from('analysis_usage')
+    .update({ usage_count: (existing?.usage_count || 0) + 1 })
+    .eq('user_id', userId)
+    .eq('month', month)
+    .select()
+  return { data, error }
+}
+
+export async function getUserPlan(userId: string) {
+  const { data, error } = await supabase
+    .from('user_plans')
+    .select('*')
+    .eq('user_id', userId)
+    .single()
+  return { data, error }
+}
+
+export async function setUserPlan(userId: string, planName: string, stripeSubscriptionId: string) {
+  const { data, error } = await supabase
+    .from('user_plans')
+    .upsert([
+      {
+        user_id: userId,
+        plan_name: planName,
+        stripe_subscription_id: stripeSubscriptionId,
+        active: true,
+      },
+    ])
+    .select()
+  return { data, error }
 }

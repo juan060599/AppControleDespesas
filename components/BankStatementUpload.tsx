@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { colors, spacing, typography, shadows, borderRadius, transitions } from '@/lib/designSystem'
 import { Upload, FileText, Loader, CheckCircle, AlertCircle, Trash2 } from 'lucide-react'
 import { parseCSV, parseOFX } from '@/lib/aiAnalysis'
-import { addTransaction, getCurrentUser } from '@/lib/database'
+import { addTransaction, getCurrentUser, getAnalysisUsage, incrementAnalysisUsage } from '@/lib/database'
 
 interface BankStatementUploadProps {
   onTransactionsAdded?: () => void
@@ -27,6 +27,27 @@ export default function BankStatementUpload({ onTransactionsAdded }: BankStateme
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [selectedTransactions, setSelectedTransactions] = useState<Set<number>>(new Set())
+  const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all')
+  const [analysisCount, setAnalysisCount] = useState(0)
+  const [analysisLimit] = useState(5)
+
+  useEffect(() => {
+    const checkAnalysisUsage = async () => {
+      try {
+        const user = await getCurrentUser()
+        if (!user) return
+
+        const now = new Date()
+        const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+        const { data } = await getAnalysisUsage(user.id, month)
+        setAnalysisCount(data?.usage_count || 0)
+      } catch (error) {
+        console.error('Error checking analysis usage:', error)
+      }
+    }
+
+    checkAnalysisUsage()
+  }, [transactions])
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0]
@@ -41,6 +62,12 @@ export default function BankStatementUpload({ onTransactionsAdded }: BankStateme
   const handleAnalyze = async () => {
     if (!file) {
       setError('Selecione um arquivo primeiro')
+      return
+    }
+
+    // Verificar limite de análises
+    if (analysisCount >= analysisLimit) {
+      setError(`❌ Você atingiu o limite de ${analysisLimit} análises este mês. Adquira o plano Pro para análises ilimitadas!`)
       return
     }
 
@@ -108,6 +135,19 @@ export default function BankStatementUpload({ onTransactionsAdded }: BankStateme
         return
       }
 
+      // Increment analysis usage
+      try {
+        const user = await getCurrentUser()
+        if (user) {
+          const now = new Date()
+          const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+          await incrementAnalysisUsage(user.id, month)
+          setAnalysisCount(prev => prev + 1)
+        }
+      } catch (err) {
+        console.error('Error incrementing analysis usage:', err)
+      }
+
       setTransactions(parsedTransactions)
       setSelectedTransactions(new Set(Array.from({ length: parsedTransactions.length }, (_, i) => i)))
       setSuccess(`${parsedTransactions.length} transações encontradas!`)
@@ -139,10 +179,17 @@ export default function BankStatementUpload({ onTransactionsAdded }: BankStateme
 
       let inserted = 0
       let failed = 0
+      let skipped = 0
 
-      // Insert selected transactions
+      // Insert selected transactions (filtered by type)
       for (const index of Array.from(selectedTransactions)) {
         const tx = transactions[index]
+
+        // Filtrar por tipo selecionado
+        if (filterType !== 'all' && tx.type !== filterType) {
+          skipped++
+          continue
+        }
 
         try {
           const { error: addError } = await addTransaction({
@@ -167,7 +214,7 @@ export default function BankStatementUpload({ onTransactionsAdded }: BankStateme
       }
 
       setSuccess(
-        `✅ ${inserted} transações inseridas com sucesso!${failed > 0 ? ` (${failed} falharam)` : ''}`
+        `✅ ${inserted} transações inseridas com sucesso!${failed > 0 ? ` (${failed} falharam)` : ''}${skipped > 0 ? ` (${skipped} ignoradas pelo filtro)` : ''}`
       )
 
       // Reset form
@@ -234,7 +281,7 @@ export default function BankStatementUpload({ onTransactionsAdded }: BankStateme
         >
           <Upload size={24} color={colors.primary[600]} />
         </div>
-        <div>
+        <div style={{ flex: 1 }}>
           <h2
             style={{
               fontSize: typography.h4.fontSize,
@@ -253,6 +300,26 @@ export default function BankStatementUpload({ onTransactionsAdded }: BankStateme
             }}
           >
             IA analisa e lança automaticamente
+          </p>
+        </div>
+        <div
+          style={{
+            padding: `${spacing.sm} ${spacing.md}`,
+            backgroundColor: analysisCount >= analysisLimit ? colors.status.error + '15' : colors.primary[50],
+            borderRadius: borderRadius.md,
+            border: `1px solid ${analysisCount >= analysisLimit ? colors.status.error : colors.primary[200]}`,
+            textAlign: 'center',
+          }}
+        >
+          <p style={{ ...typography.label, margin: 0, color: colors.secondary[900] }}>
+            {analysisCount}/{analysisLimit} análises
+          </p>
+          <p style={{
+            ...typography.small,
+            margin: `${spacing.xs} 0 0 0`,
+            color: analysisCount >= analysisLimit ? colors.status.error : colors.secondary[500],
+          }}>
+            {analysisCount >= analysisLimit ? '❌ Limite atingido' : `${analysisLimit - analysisCount} restantes`}
           </p>
         </div>
       </div>
@@ -437,6 +504,41 @@ export default function BankStatementUpload({ onTransactionsAdded }: BankStateme
       {/* Transactions List */}
       {transactions.length > 0 && (
         <div>
+          {/* Filter Type */}
+          <div
+            style={{
+              display: 'flex',
+              gap: spacing.md,
+              marginBottom: spacing.lg,
+              padding: spacing.md,
+              background: colors.primary[50],
+              borderRadius: borderRadius.lg,
+              alignItems: 'center',
+            }}
+          >
+            <label style={{ ...typography.label, color: colors.secondary[900], margin: 0 }}>
+              Importar:
+            </label>
+            <select
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value as 'all' | 'income' | 'expense')}
+              style={{
+                padding: `${spacing.sm} ${spacing.md}`,
+                border: `1px solid ${colors.primary[300]}`,
+                borderRadius: borderRadius.md,
+                backgroundColor: colors.background.light,
+                color: colors.secondary[900],
+                fontSize: typography.small.fontSize,
+                fontWeight: 500,
+                cursor: 'pointer',
+              }}
+            >
+              <option value="all">Ambos (Despesas + Receitas)</option>
+              <option value="expense">Apenas Despesas</option>
+              <option value="income">Apenas Receitas</option>
+            </select>
+          </div>
+
           {/* Select All */}
           <div
             style={{
