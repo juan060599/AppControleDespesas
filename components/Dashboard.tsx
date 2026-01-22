@@ -70,20 +70,24 @@ export default function Dashboard({ transactions, userId }: DashboardProps) {
   const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899']
 
   return (
-    <div style={{ padding: `${spacing.lg} 0` }}>
+    <div style={{ padding: 0 }}>
       {/* Period Filter - Only visible in Overview tab */}
       {activeTab === 'overview' && (
         <div style={{
-          marginBottom: spacing.xl,
+          marginBottom: spacing.md,
+          marginTop: spacing.md,
           display: 'flex',
-          gap: spacing.md,
+          gap: spacing.sm,
           flexWrap: 'wrap',
           alignItems: 'center',
-        }}>
+          overflowX: 'auto',
+          paddingBottom: spacing.xs,
+        } as React.CSSProperties}>
           <span style={{
-            fontSize: typography.body.fontSize,
+            fontSize: '13px',
             fontWeight: 600,
             color: colors.secondary[700],
+            whiteSpace: 'nowrap',
           }}>
             📅 Período:
           </span>
@@ -92,7 +96,7 @@ export default function Dashboard({ transactions, userId }: DashboardProps) {
               key={key}
               onClick={() => setSelectedPeriod(key as PeriodType)}
               style={{
-                padding: `${spacing.sm} ${spacing.lg}`,
+                padding: `${spacing.xs} ${spacing.sm}`,
                 borderRadius: borderRadius.lg,
                 border: selectedPeriod === key ? `2px solid ${colors.primary[600]}` : `1px solid ${colors.secondary[200]}`,
                 background: selectedPeriod === key ? colors.primary[50] : 'white',
@@ -100,7 +104,9 @@ export default function Dashboard({ transactions, userId }: DashboardProps) {
                 fontWeight: selectedPeriod === key ? 600 : 400,
                 cursor: 'pointer',
                 transition: transitions.normal,
-                fontSize: typography.body.fontSize,
+                fontSize: 'calc(12px + 0.5vw)',
+                minHeight: '36px',
+                whiteSpace: 'nowrap',
               }}
               onMouseOver={(e) => {
                 if (selectedPeriod !== key) {
@@ -124,10 +130,10 @@ export default function Dashboard({ transactions, userId }: DashboardProps) {
       {/* Stats Cards Section */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-        gap: spacing.lg,
-        marginBottom: spacing.xxl,
-      }}>
+        gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
+        gap: spacing.md,
+        marginBottom: spacing.xl,
+      } as React.CSSProperties}>
         <StatCard
           title="Receitas"
           value={`R$ ${totalIncome.toFixed(2)}`}
@@ -157,10 +163,10 @@ export default function Dashboard({ transactions, userId }: DashboardProps) {
       {/* Charts Grid */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))',
-        gap: spacing.lg,
-        marginBottom: spacing.xxl,
-      }}>
+        gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 400px), 1fr))',
+        gap: spacing.md,
+        marginBottom: spacing.xl,
+      } as React.CSSProperties}>
         {/* Income vs Expense */}
         <div style={{
           ...{
@@ -168,7 +174,8 @@ export default function Dashboard({ transactions, userId }: DashboardProps) {
             borderRadius: borderRadius.xl,
             boxShadow: shadows.md,
             border: `1px solid ${colors.primary[100]}`,
-            padding: spacing.xl,
+            padding: spacing.md,
+            overflowX: 'auto',
           } as React.CSSProperties
         }}>
           <div style={{
@@ -199,7 +206,7 @@ export default function Dashboard({ transactions, userId }: DashboardProps) {
           </div>
 
           {incomeExpenseData.length > 0 && (incomeExpenseData[0].value > 0 || incomeExpenseData[1].value > 0) ? (
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={250}>
               <BarChart data={incomeExpenseData}>
                 <CartesianGrid strokeDasharray="3 3" stroke={colors.secondary[200]} />
                 <XAxis dataKey="name" stroke={colors.secondary[500]} />
@@ -277,10 +284,10 @@ export default function Dashboard({ transactions, userId }: DashboardProps) {
           {/* Features Section: Recurring Expenses & Financial Goals */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))',
-            gap: spacing.lg,
-            marginBottom: spacing.xxl,
-          }}>
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 350px), 1fr))',
+            gap: spacing.md,
+            marginBottom: spacing.xl,
+          } as React.CSSProperties}>
             <RecurringExpenses userId={userId} />
             <FinancialGoals userId={userId} />
           </div>

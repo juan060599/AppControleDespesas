@@ -25,8 +25,8 @@ export default function StatCard({
       borderRadius: borderRadius.xl,
       boxShadow: shadows.md,
       border: `1px solid ${colors.primary[100]}`,
-      padding: spacing.xl,
-      minHeight: '140px',
+      padding: `${spacing.lg} ${spacing.md}`,
+      minHeight: '120px',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'space-between',
@@ -114,7 +114,7 @@ export default function StatCard({
       }}>
         <div>
           <p style={{
-            fontSize: '28px',
+            fontSize: '24px',
             fontWeight: 700,
             color: colors.secondary[900],
             margin: 0,

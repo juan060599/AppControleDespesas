@@ -116,7 +116,7 @@ export default function RecurringExpenses({ userId }: RecurringExpensesProps) {
       {/* Header Premium */}
       <div
         style={{
-          padding: spacing.lg,
+          padding: `${spacing.md} ${spacing.md}`,
           background: `linear-gradient(135deg, ${colors.primary[50]} 0%, ${colors.primary[100]} 100%)`,
           borderBottom: `1px solid ${colors.primary[100]}`,
           display: 'flex',
@@ -127,23 +127,23 @@ export default function RecurringExpenses({ userId }: RecurringExpensesProps) {
         <div>
           <h3
             style={{
-              fontSize: typography.h3.fontSize,
+              fontSize: '16px',
               fontWeight: 700,
               color: colors.secondary[900],
               margin: 0,
               marginBottom: spacing.xs,
             }}
           >
-            💳 Assinaturas & Gastos Recorrentes
+            💳 Recorrentes
           </h3>
           <p
             style={{
-              fontSize: typography.small.fontSize,
+              fontSize: '12px',
               color: colors.secondary[600],
               margin: 0,
             }}
           >
-            Rastreie suas despesas periódicas
+            Despesas periódicas
           </p>
         </div>
         <button
@@ -152,13 +152,13 @@ export default function RecurringExpenses({ userId }: RecurringExpensesProps) {
             background: colors.primary[600],
             border: 'none',
             color: 'white',
-            padding: `${spacing.md} ${spacing.lg}`,
+            padding: `${spacing.sm} ${spacing.md}`,
             borderRadius: borderRadius.lg,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: spacing.sm,
-            fontSize: typography.body.fontSize,
+            gap: spacing.xs,
+            fontSize: '13px',
             fontWeight: 600,
             transition: transitions.normal,
             boxShadow: shadows.sm,

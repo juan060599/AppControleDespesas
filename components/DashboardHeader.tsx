@@ -44,7 +44,7 @@ export default function DashboardHeader({ userName, onLogout }: DashboardHeaderP
       <div style={{
         maxWidth: '1400px',
         margin: '0 auto',
-        padding: `${spacing.lg} ${spacing.xl}`,
+        padding: `${spacing.md} ${spacing.sm}`,
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -59,8 +59,8 @@ export default function DashboardHeader({ userName, onLogout }: DashboardHeaderP
           cursor: 'pointer',
         }}>
           <div style={{
-            width: '44px',
-            height: '44px',
+            width: '36px',
+            height: '36px',
             background: `linear-gradient(135deg, ${colors.primary[500]} 0%, ${colors.primary[600]} 100%)`,
             borderRadius: borderRadius.lg,
             display: 'flex',
@@ -76,7 +76,7 @@ export default function DashboardHeader({ userName, onLogout }: DashboardHeaderP
             </svg>
           </div>
           <h1 style={{
-            fontSize: '24px',
+            fontSize: '20px',
             fontWeight: 700,
             color: colors.secondary[900],
             margin: 0,

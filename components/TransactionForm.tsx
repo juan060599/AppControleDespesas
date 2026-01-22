@@ -73,7 +73,7 @@ export default function TransactionForm({ onTransactionAdded }: TransactionFormP
       borderRadius: borderRadius.xl,
       boxShadow: shadows.md,
       border: `1px solid ${colors.primary[100]}`,
-      padding: spacing.xl,
+      padding: `${spacing.lg} ${spacing.md}`,
       height: 'fit-content',
     }}>
       {/* Header */}
@@ -81,21 +81,21 @@ export default function TransactionForm({ onTransactionAdded }: TransactionFormP
         display: 'flex',
         alignItems: 'center',
         gap: spacing.md,
-        marginBottom: spacing.lg,
+        marginBottom: spacing.md,
       }}>
         <div style={{
-          width: '44px',
-          height: '44px',
+          width: '40px',
+          height: '40px',
           background: colors.primary[100],
           borderRadius: borderRadius.lg,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
         }}>
-          <Plus size={24} color={colors.primary[600]} />
+          <Plus size={20} color={colors.primary[600]} />
         </div>
         <h2 style={{
-          fontSize: typography.h4.fontSize,
+          fontSize: '18px',
           fontWeight: 700,
           color: colors.secondary[900],
           margin: 0,
@@ -106,11 +106,11 @@ export default function TransactionForm({ onTransactionAdded }: TransactionFormP
 
       <form onSubmit={handleSubmit}>
         {/* Type Selection */}
-        <div style={{ marginBottom: spacing.lg }}>
+        <div style={{ marginBottom: spacing.md }}>
           <div style={{
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
-            gap: spacing.md,
+            gap: spacing.sm,
           }}>
             {/* Despesa Button */}
             <button
@@ -120,19 +120,19 @@ export default function TransactionForm({ onTransactionAdded }: TransactionFormP
                 setCategory(EXPENSE_CATEGORIES[0])
               }}
               style={{
-                padding: `${spacing.md} ${spacing.md}`,
+                padding: `${spacing.sm} ${spacing.md}`,
                 background: type === 'expense' ? colors.status.error + '20' : colors.secondary[100],
                 border: type === 'expense' ? `2px solid ${colors.status.error}` : `1px solid ${colors.secondary[200]}`,
                 borderRadius: borderRadius.lg,
                 color: type === 'expense' ? colors.status.error : colors.secondary[600],
                 fontWeight: 600,
-                fontSize: typography.body.fontSize,
+                fontSize: '13px',
                 cursor: 'pointer',
                 transition: transitions.normal,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: spacing.sm,
+                gap: spacing.xs,
               }}
               onMouseEnter={(e) => {
                 if (type !== 'expense') {
@@ -145,7 +145,7 @@ export default function TransactionForm({ onTransactionAdded }: TransactionFormP
                 }
               }}
             >
-              <ArrowDownLeft size={18} />
+              <ArrowDownLeft size={16} />
               Despesa
             </button>
 
@@ -157,19 +157,19 @@ export default function TransactionForm({ onTransactionAdded }: TransactionFormP
                 setCategory(INCOME_CATEGORIES[0])
               }}
               style={{
-                padding: `${spacing.md} ${spacing.md}`,
+                padding: `${spacing.sm} ${spacing.md}`,
                 background: type === 'income' ? colors.status.success + '20' : colors.secondary[100],
                 border: type === 'income' ? `2px solid ${colors.status.success}` : `1px solid ${colors.secondary[200]}`,
                 borderRadius: borderRadius.lg,
                 color: type === 'income' ? colors.status.success : colors.secondary[600],
                 fontWeight: 600,
-                fontSize: typography.body.fontSize,
+                fontSize: '13px',
                 cursor: 'pointer',
                 transition: transitions.normal,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: spacing.sm,
+                gap: spacing.xs,
               }}
               onMouseEnter={(e) => {
                 if (type !== 'income') {
@@ -182,20 +182,20 @@ export default function TransactionForm({ onTransactionAdded }: TransactionFormP
                 }
               }}
             >
-              <ArrowUpRight size={18} />
+              <ArrowUpRight size={16} />
               Receita
             </button>
           </div>
         </div>
 
         {/* Description Input */}
-        <div style={{ marginBottom: spacing.lg }}>
+        <div style={{ marginBottom: spacing.md }}>
           <label style={{
             display: 'block',
-            fontSize: typography.label.fontSize,
+            fontSize: '13px',
             fontWeight: 600,
             color: colors.secondary[900],
-            marginBottom: spacing.sm,
+            marginBottom: spacing.xs,
           }}>
             Descrição
           </label>
@@ -204,11 +204,11 @@ export default function TransactionForm({ onTransactionAdded }: TransactionFormP
               type="text"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder={type === 'expense' ? 'Ex: Café da manhã' : 'Ex: Salário mensal'}
+              placeholder={type === 'expense' ? 'Ex: Café' : 'Ex: Salário'}
               style={{
                 width: '100%',
-                padding: `${spacing.md} ${spacing.md}`,
-                fontSize: typography.body.fontSize,
+                padding: `${spacing.sm} ${spacing.md}`,
+                fontSize: '14px',
                 border: `1px solid ${colors.secondary[200]}`,
                 borderRadius: borderRadius.lg,
                 backgroundColor: colors.background.light,
@@ -229,13 +229,13 @@ export default function TransactionForm({ onTransactionAdded }: TransactionFormP
         </div>
 
         {/* Amount Input */}
-        <div style={{ marginBottom: spacing.lg }}>
+        <div style={{ marginBottom: spacing.md }}>
           <label style={{
             display: 'block',
-            fontSize: typography.label.fontSize,
+            fontSize: '13px',
             fontWeight: 600,
             color: colors.secondary[900],
-            marginBottom: spacing.sm,
+            marginBottom: spacing.xs,
           }}>
             Valor (R$)
           </label>
@@ -248,8 +248,8 @@ export default function TransactionForm({ onTransactionAdded }: TransactionFormP
             min="0"
             style={{
               width: '100%',
-              padding: `${spacing.md} ${spacing.md}`,
-              fontSize: typography.body.fontSize,
+              padding: `${spacing.sm} ${spacing.md}`,
+              fontSize: '14px',
               border: `1px solid ${colors.secondary[200]}`,
               borderRadius: borderRadius.lg,
               backgroundColor: colors.background.light,
@@ -269,13 +269,13 @@ export default function TransactionForm({ onTransactionAdded }: TransactionFormP
         </div>
 
         {/* Category Select */}
-        <div style={{ marginBottom: spacing.lg }}>
+        <div style={{ marginBottom: spacing.md }}>
           <label style={{
             display: 'block',
-            fontSize: typography.label.fontSize,
+            fontSize: '13px',
             fontWeight: 600,
             color: colors.secondary[900],
-            marginBottom: spacing.sm,
+            marginBottom: spacing.xs,
           }}>
             Categoria
           </label>
@@ -284,8 +284,8 @@ export default function TransactionForm({ onTransactionAdded }: TransactionFormP
             onChange={(e) => setCategory(e.target.value)}
             style={{
               width: '100%',
-              padding: `${spacing.md} ${spacing.md}`,
-              fontSize: typography.body.fontSize,
+              padding: `${spacing.sm} ${spacing.md}`,
+              fontSize: '14px',
               border: `1px solid ${colors.secondary[200]}`,
               borderRadius: borderRadius.lg,
               backgroundColor: colors.background.light,
@@ -313,10 +313,10 @@ export default function TransactionForm({ onTransactionAdded }: TransactionFormP
         </div>
 
         {/* Date Input */}
-        <div style={{ marginBottom: spacing.lg }}>
+        <div style={{ marginBottom: spacing.md }}>
           <label style={{
             display: 'block',
-            fontSize: typography.label.fontSize,
+            fontSize: '13px',
             fontWeight: 600,
             color: colors.secondary[900],
             marginBottom: spacing.sm,

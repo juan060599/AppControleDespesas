@@ -104,27 +104,28 @@ export default function DashboardPage() {
     <div style={{
       minHeight: '100vh',
       background: colors.background.lighter,
+      paddingBottom: spacing.xl,
     }}>
       <DashboardHeader userName={user.user_metadata?.name || user.email || 'Usuário'} onLogout={handleLogout} />
 
       {/* Main Content */}
       <main style={{
-        maxWidth: '1400px',
+        maxWidth: '100%',
         margin: '0 auto',
-        padding: spacing.xl,
-      }}>
+        padding: `${spacing.md} ${spacing.sm}`,
+      } as React.CSSProperties}>
         <div style={{
           display: 'grid',
-          gridTemplateColumns: '1fr 380px',
-          gap: spacing.xl,
+          gridTemplateColumns: '1fr',
+          gap: spacing.md,
           alignItems: 'start',
-        }}>
+        } as React.CSSProperties}>
           {/* Left Column - Main Dashboard */}
           <div style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: spacing.xl,
-          }}>
+            gap: spacing.md,
+          } as React.CSSProperties}>
             {/* Dashboard Section */}
             <section>
               <Dashboard transactions={transactions} userId={user.id} />
@@ -144,16 +145,16 @@ export default function DashboardPage() {
 
             {/* Spending Alerts Section */}
             <section>
-              <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: spacing.md as any, color: colors.secondary[900] }}>
-                ⚠️ Avisos e Alertas
+              <h2 style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: spacing.sm as any, color: colors.secondary[900], marginTop: spacing.md }}>
+                ⚠️ Avisos
               </h2>
               <SpendingAlerts transactions={transactions} />
             </section>
 
             {/* Spending Suggestions Section */}
             <section>
-              <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: spacing.md as any, color: colors.secondary[900] }}>
-                💡 Sugestões de Economia
+              <h2 style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: spacing.sm as any, color: colors.secondary[900], marginTop: spacing.md }}>
+                💡 Sugestões
               </h2>
               <SpendingSuggestions transactions={transactions} />
             </section>
@@ -166,9 +167,8 @@ export default function DashboardPage() {
 
           {/* Right Column - Transaction Form */}
           <div style={{
-            position: 'sticky',
-            top: `calc(64px + ${spacing.xl})`,
-          }}>
+            position: 'static',
+          } as React.CSSProperties}>
             <TransactionForm onTransactionAdded={handleTransactionAdded} />
           </div>
         </div>
