@@ -7,8 +7,9 @@ import StatCard from './StatCard'
 import RecurringExpenses from './RecurringExpenses'
 import FinancialGoals from './FinancialGoals'
 import Insights from './Insights'
+import TransactionForm from './TransactionForm'
 import { colors, spacing, typography, shadows, borderRadius, transitions } from '@/lib/designSystem'
-import { TrendingUp, TrendingDown, BarChart3 } from 'lucide-react'
+import { TrendingUp, TrendingDown, BarChart3, Plus } from 'lucide-react'
 
 interface DashboardProps {
   transactions: Transaction[]
@@ -35,6 +36,8 @@ export default function Dashboard({ transactions, userId }: DashboardProps) {
   const [totalIncome, setTotalIncome] = useState(0)
   const [totalExpense, setTotalExpense] = useState(0)
   const [balance, setBalance] = useState(0)
+  const [showTransactionForm, setShowTransactionForm] = useState(false)
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
 
   useEffect(() => {
     const { startDate, endDate } = getPeriodDates(selectedPeriod)
@@ -79,6 +82,131 @@ export default function Dashboard({ transactions, userId }: DashboardProps) {
           .dashboard-container {
             padding: 24px;
           }
+        }
+
+        /* Quick Transaction Form */
+        .quick-transaction-section {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          border-radius: 12px;
+          padding: 16px;
+          margin-bottom: 16px;
+          color: white;
+          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        @media (min-width: 480px) {
+          .quick-transaction-section {
+            padding: 20px;
+            margin-bottom: 20px;
+          }
+        }
+
+        @media (min-width: 768px) {
+          .quick-transaction-section {
+            padding: 24px;
+            margin-bottom: 24px;
+          }
+        }
+
+        .transaction-title {
+          font-size: 16px;
+          font-weight: 700;
+          margin: 0 0 12px 0;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        @media (min-width: 480px) {
+          .transaction-title {
+            font-size: 18px;
+            margin-bottom: 16px;
+          }
+        }
+
+        /* Pricing Banner */
+        .pricing-banner {
+          background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+          border-radius: 12px;
+          padding: 16px;
+          margin-bottom: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+        @media (min-width: 480px) {
+          .pricing-banner {
+            padding: 20px;
+            margin-bottom: 20px;
+            gap: 16px;
+          }
+        }
+
+        @media (min-width: 768px) {
+          .pricing-banner {
+            padding: 24px;
+            margin-bottom: 24px;
+            gap: 20px;
+          }
+        }
+
+        .pricing-content {
+          flex: 1;
+        }
+
+        .pricing-title {
+          font-size: 16px;
+          font-weight: 700;
+          color: #92400e;
+          margin: 0 0 4px 0;
+        }
+
+        @media (min-width: 480px) {
+          .pricing-title {
+            font-size: 17px;
+            margin-bottom: 6px;
+          }
+        }
+
+        .pricing-description {
+          font-size: 13px;
+          color: #b45309;
+          margin: 0;
+        }
+
+        @media (min-width: 480px) {
+          .pricing-description {
+            font-size: 14px;
+          }
+        }
+
+        .pricing-button {
+          background: white;
+          color: #f59e0b;
+          border: none;
+          border-radius: 8px;
+          padding: 8px 16px;
+          font-weight: 700;
+          font-size: 13px;
+          cursor: pointer;
+          white-space: nowrap;
+          transition: all 0.2s;
+          flex-shrink: 0;
+        }
+
+        @media (min-width: 480px) {
+          .pricing-button {
+            padding: 10px 20px;
+            font-size: 14px;
+          }
+        }
+
+        .pricing-button:hover {
+          background: #fef3c7;
+          transform: translateY(-2px);
         }
 
         /* Period Filter */
@@ -268,9 +396,161 @@ export default function Dashboard({ transactions, userId }: DashboardProps) {
             gap: 16px;
           }
         }
+
+        /* Transaction Form Modal */
+        .transaction-form-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 40;
+          animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        .transaction-form-modal {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          width: 100%;
+          max-height: 90vh;
+          background: white;
+          border-radius: 16px 16px 0 0;
+          box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.15);
+          z-index: 50;
+          overflow-y: auto;
+          animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+          from { transform: translateY(100%); }
+          to { transform: translateY(0); }
+        }
+
+        @media (min-width: 768px) {
+          .transaction-form-overlay {
+            background: rgba(0, 0, 0, 0.3);
+          }
+
+          .transaction-form-modal {
+            position: absolute;
+            bottom: auto;
+            max-height: none;
+            width: auto;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            animation: slideDown 0.3s ease;
+          }
+
+          @keyframes slideDown {
+            from {
+              opacity: 0;
+              transform: translateY(-20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        }
+
+        .transaction-form-header {
+          padding: 16px;
+          border-bottom: 1px solid #e5e7eb;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          position: sticky;
+          top: 0;
+          background: white;
+          border-radius: 16px 16px 0 0;
+          z-index: 1;
+        }
+
+        @media (min-width: 480px) {
+          .transaction-form-header {
+            padding: 20px;
+          }
+        }
+
+        .transaction-form-content {
+          padding: 16px;
+        }
+
+        @media (min-width: 480px) {
+          .transaction-form-content {
+            padding: 20px;
+          }
+        }
+
+        .close-button {
+          background: none;
+          border: none;
+          cursor: pointer;
+          color: #6b7280;
+          font-size: 24px;
+          padding: 0;
+          width: 32px;
+          height: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
       `}</style>
 
       <div className="dashboard-container">
+        {/* Quick Transaction Form Button */}
+        <div className="quick-transaction-section">
+          <h3 className="transaction-title">
+            <Plus size={20} />
+            Nova Transação
+          </h3>
+          <button
+            onClick={() => setShowTransactionForm(true)}
+            style={{
+              width: '100%',
+              padding: '12px',
+              background: 'rgba(255, 255, 255, 0.2)',
+              border: '2px dashed rgba(255, 255, 255, 0.5)',
+              color: 'white',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)'
+              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.7)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)'
+              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.5)'
+            }}
+          >
+            + Adicionar Transação
+          </button>
+        </div>
+
+        {/* Pricing Banner */}
+        <div className="pricing-banner">
+          <div className="pricing-content">
+            <h4 className="pricing-title">💳 Plano Pro Disponível</h4>
+            <p className="pricing-description">
+              Desbloqueie análises com IA e sugestões de economia
+            </p>
+          </div>
+          <button
+            onClick={() => window.location.href = '/pricing'}
+            className="pricing-button"
+          >
+            Ver Planos
+          </button>
+        </div>
         {/* Period Filter */}
         {activeTab === 'overview' && (
           <div className="period-filter">
@@ -391,6 +671,38 @@ export default function Dashboard({ transactions, userId }: DashboardProps) {
 
         {activeTab === 'insights' && (
           <Insights userId={userId} allTransactions={transactions} />
+        )}
+
+        {/* Transaction Form Modal */}
+        {showTransactionForm && (
+          <>
+            <div
+              className="transaction-form-overlay"
+              onClick={() => setShowTransactionForm(false)}
+            />
+            <div className="transaction-form-modal">
+              <div className="transaction-form-header">
+                <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700 }}>
+                  ➕ Adicionar Transação
+                </h3>
+                <button
+                  className="close-button"
+                  onClick={() => setShowTransactionForm(false)}
+                  title="Fechar"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="transaction-form-content">
+                <TransactionForm
+                  onTransactionAdded={() => {
+                    setShowTransactionForm(false)
+                    setRefreshTrigger(prev => prev + 1)
+                  }}
+                />
+              </div>
+            </div>
+          </>
         )}
       </div>
     </div>
