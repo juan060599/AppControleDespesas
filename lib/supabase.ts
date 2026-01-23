@@ -1,25 +1,13 @@
 import { createClient } from '@supabase/supabase-js'
 
-let supabaseClient: ReturnType<typeof createClient> | null = null
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || 'placeholder_key'
 
-function getSupabaseClient() {
-  if (supabaseClient) {
-    return supabaseClient
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+
+// Validate environment variables at runtime for server-side code
+if (typeof window === 'undefined') {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY) {
+    console.warn('Warning: Supabase environment variables are not set. API calls will fail at runtime.')
   }
-
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error('Missing Supabase environment variables')
-  }
-
-  supabaseClient = createClient(supabaseUrl, supabaseAnonKey)
-  return supabaseClient
 }
-
-export const supabase = new Proxy({} as ReturnType<typeof createClient>, {
-  get(target, prop) {
-    return getSupabaseClient()[prop as keyof ReturnType<typeof createClient>]
-  },
-})
