@@ -49,36 +49,37 @@ export default function BudgetTracker({ transactions, budgets, onEdit, onDelete 
         boxShadow: shadows.md,
         border: `1px solid ${colors.primary[100]}`,
         overflow: 'hidden',
-        marginBottom: spacing.lg,
+        marginBottom: 'clamp(12px, 2vw, 24px)',
       }}
     >
       {/* Header */}
       <div
         style={{
-          padding: spacing.lg,
+          padding: 'clamp(12px, 2vw, 24px) clamp(12px, 3vw, 32px)',
           borderBottom: `1px solid ${colors.primary[100]}`,
           display: 'flex',
           alignItems: 'center',
-          gap: spacing.md,
+          gap: 'clamp(12px, 2vw, 16px)',
         }}
       >
         <div
           style={{
-            width: '44px',
-            height: '44px',
+            width: 'clamp(36px, 8vw, 44px)',
+            height: 'clamp(36px, 8vw, 44px)',
             background: colors.primary[100],
             borderRadius: borderRadius.lg,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            flexShrink: 0,
           }}
         >
-          <TrendingDown size={24} color={colors.primary[600]} />
+          <TrendingDown size={20} color={colors.primary[600]} />
         </div>
         <div>
           <h3
             style={{
-              fontSize: typography.h3.fontSize,
+              fontSize: 'clamp(16px, 4vw, 24px)',
               fontWeight: 700,
               color: colors.secondary[900],
               margin: 0,
@@ -88,9 +89,9 @@ export default function BudgetTracker({ transactions, budgets, onEdit, onDelete 
           </h3>
           <p
             style={{
-              fontSize: typography.small.fontSize,
+              fontSize: 'clamp(11px, 1.5vw, 12px)',
               color: colors.secondary[500],
-              margin: `${spacing.xs} 0 0 0`,
+              margin: `clamp(4px, 1vw, 6px) 0 0 0`,
             }}
           >
             Controle seus limites mensais por categoria
@@ -99,7 +100,7 @@ export default function BudgetTracker({ transactions, budgets, onEdit, onDelete 
       </div>
 
       {/* Budgets List */}
-      <div style={{ padding: spacing.lg }}>
+      <div style={{ padding: 'clamp(12px, 2vw, 24px)' }}>
         {budgets.map((budget, index) => {
           const spent = categorySpend[budget.category] || 0
           const percentage = Math.min((spent / budget.limit) * 100, 100)
@@ -110,8 +111,8 @@ export default function BudgetTracker({ transactions, budgets, onEdit, onDelete 
             <div
               key={budget.id}
               style={{
-                marginBottom: index < budgets.length - 1 ? spacing.lg : 0,
-                padding: spacing.lg,
+                marginBottom: index < budgets.length - 1 ? 'clamp(12px, 2vw, 24px)' : 0,
+                padding: 'clamp(12px, 2vw, 24px)',
                 backgroundColor: isOverBudget ? colors.status.error + '08' : colors.secondary[50],
                 border: `1px solid ${
                   isOverBudget ? colors.status.error + '30' : colors.secondary[200]
@@ -126,24 +127,28 @@ export default function BudgetTracker({ transactions, budgets, onEdit, onDelete 
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'flex-start',
-                  marginBottom: spacing.md,
+                  marginBottom: 'clamp(8px, 1.5vw, 16px)',
+                  gap: 'clamp(8px, 2vw, 12px)',
                 }}
               >
-                <div>
+                <div style={{ flex: 1, minWidth: 0 }}>
                   <h4
                     style={{
-                      fontSize: typography.body.fontSize,
+                      fontSize: 'clamp(13px, 2vw, 14px)',
                       fontWeight: 600,
                       color: colors.secondary[900],
                       margin: 0,
-                      marginBottom: spacing.xs,
+                      marginBottom: 'clamp(4px, 1vw, 6px)',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
                     }}
                   >
                     {budget.category}
                   </h4>
                   <p
                     style={{
-                      fontSize: typography.small.fontSize,
+                      fontSize: 'clamp(11px, 1.5vw, 12px)',
                       color: colors.secondary[500],
                       margin: 0,
                     }}

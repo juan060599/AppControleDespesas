@@ -1,10 +1,10 @@
 'use client'
 
-import { colors, spacing, typography, shadows, borderRadius, transitions } from '@/lib/designSystem'
-import { LogOut, Menu, X, Settings } from 'lucide-react'
+import { LogOut, Settings, Menu } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import NotificationBell from './NotificationBell'
+import { colors, shadows, borderRadius } from '@/lib/designSystem'
 import { getCurrentUser } from '@/lib/database'
 
 interface DashboardHeaderProps {
@@ -14,9 +14,8 @@ interface DashboardHeaderProps {
 
 export default function DashboardHeader({ userName, onLogout }: DashboardHeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [userId, setUserId] = useState<string | null>(null)
+  const [userId, setUserId] = useState<string>('')
 
-  // Get user ID for notifications
   useEffect(() => {
     const getUser = async () => {
       const user = await getCurrentUser()
@@ -39,250 +38,245 @@ export default function DashboardHeader({ userName, onLogout }: DashboardHeaderP
       position: 'sticky',
       top: 0,
       zIndex: 100,
-      transition: transitions.normal,
+      width: '100%',
     }}>
-      <div style={{
-        maxWidth: '1400px',
-        margin: '0 auto',
-        padding: `${spacing.md} ${spacing.sm}`,
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      }}>
+      <style>{`
+        * {
+          box-sizing: border-box;
+        }
+
+        .header-wrapper {
+          width: 100%;
+          padding: 12px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 12px;
+        }
+
+        @media (min-width: 480px) {
+          .header-wrapper {
+            padding: 14px 16px;
+          }
+        }
+
+        @media (min-width: 768px) {
+          .header-wrapper {
+            padding: 16px 24px;
+          }
+        }
+
+        /* Logo */
+        .logo-section {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-shrink: 0;
+        }
+
+        .logo-icon {
+          width: 32px;
+          height: 32px;
+          background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .logo-text {
+          font-size: 16px;
+          font-weight: 700;
+          color: #111827;
+          white-space: nowrap;
+        }
+
+        @media (min-width: 480px) {
+          .logo-text {
+            font-size: 18px;
+          }
+        }
+
+        /* Center - User Info */
+        .user-section {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          min-width: 0;
+        }
+
+        .user-text {
+          font-size: 12px;
+          color: #374151;
+          margin: 0;
+          line-height: 1.3;
+        }
+
+        .user-text strong {
+          display: block;
+          font-size: 13px;
+          font-weight: 600;
+          color: #111827;
+        }
+
+        @media (min-width: 480px) {
+          .user-text {
+            font-size: 13px;
+          }
+          .user-text strong {
+            font-size: 14px;
+          }
+        }
+
+        /* Right - Actions */
+        .actions-section {
+          display: flex;
+          gap: 6px;
+          align-items: center;
+          flex-shrink: 0;
+        }
+
+        @media (min-width: 480px) {
+          .actions-section {
+            gap: 8px;
+          }
+        }
+
+        .action-button {
+          width: 36px;
+          height: 36px;
+          border-radius: 8px;
+          background: none;
+          border: 1px solid #e5e7eb;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.2s;
+          color: #374151;
+          flex-shrink: 0;
+        }
+
+        .action-button:hover {
+          background: #f9fafb;
+          border-color: #d1d5db;
+        }
+
+        .action-button svg {
+          width: 18px;
+          height: 18px;
+        }
+
+        @media (min-width: 480px) {
+          .action-button {
+            width: 40px;
+            height: 40px;
+          }
+          .action-button svg {
+            width: 20px;
+            height: 20px;
+          }
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+          position: absolute;
+          top: 100%;
+          right: 0;
+          background: white;
+          border-bottom: 1px solid #e5e7eb;
+          width: 100%;
+          display: none;
+          flex-direction: column;
+          z-index: 50;
+        }
+
+        .mobile-menu.open {
+          display: flex;
+        }
+
+        .menu-item {
+          padding: 12px 16px;
+          border-bottom: 1px solid #f3f4f6;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          font-size: 13px;
+          color: #374151;
+          cursor: pointer;
+          transition: background 0.2s;
+          text-decoration: none;
+        }
+
+        .menu-item:hover {
+          background: #f9fafb;
+        }
+
+        .menu-item svg {
+          width: 18px;
+          height: 18px;
+          flex-shrink: 0;
+        }
+
+        .menu-item.danger {
+          color: #ef4444;
+        }
+      `}</style>
+
+      <div className="header-wrapper">
         {/* Logo */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: spacing.md,
-          textDecoration: 'none',
-          color: colors.secondary[900],
-          cursor: 'pointer',
-        }}>
-          <div style={{
-            width: '36px',
-            height: '36px',
-            background: `linear-gradient(135deg, ${colors.primary[500]} 0%, ${colors.primary[600]} 100%)`,
-            borderRadius: borderRadius.lg,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: shadows.blue,
-          }}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+        <div className="logo-section">
+          <div className="logo-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
               <circle cx="12" cy="12" r="1"></circle>
               <circle cx="19" cy="12" r="1"></circle>
               <circle cx="5" cy="12" r="1"></circle>
               <path d="M12 5v14m-7-7h14"></path>
             </svg>
           </div>
-          <h1 style={{
-            fontSize: '20px',
-            fontWeight: 700,
-            color: colors.secondary[900],
-            margin: 0,
-            letterSpacing: '-0.5px',
-          }}>
-            FinControl
-          </h1>
+          <div className="logo-text">FinControl</div>
         </div>
 
-        {/* Desktop Navigation */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: spacing.xl,
-        }}>
-          {/* User Info */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: spacing.md,
-          }}>
-            <div style={{
-              textAlign: 'right',
-            }}>
-              <p style={{
-                fontSize: '14px',
-                fontWeight: 600,
-                color: colors.secondary[900],
-                margin: 0,
-              }}>
-                Bem-vindo, {userName}!
-              </p>
-              <p style={{
-                fontSize: '12px',
-                color: colors.secondary[500],
-                margin: 0,
-                marginTop: '2px',
-              }}>
-                Seus dados estão seguros
-              </p>
-            </div>
+        {/* User Info - Center */}
+        <div className="user-section">
+          <p className="user-text">
+            <strong>Bem-vindo, {userName.split(' ')[0]}!</strong>
+            Seus dados estão seguros
+          </p>
+        </div>
 
-            {/* Avatar */}
-            <div style={{
-              width: '40px',
-              height: '40px',
-              background: `linear-gradient(135deg, ${colors.primary[400]} 0%, ${colors.primary[600]} 100%)`,
-              borderRadius: borderRadius.full,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '18px',
-              fontWeight: 700,
-              color: colors.background.light,
-              boxShadow: shadows.md,
-            }}>
-              {userName.charAt(0).toUpperCase()}
-            </div>
-          </div>
-
-          {/* Pricing Button */}
-          <Link href="/pricing" style={{ textDecoration: 'none' }}>
-            <button
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: spacing.sm,
-                padding: `10px ${spacing.md}`,
-                background: `linear-gradient(135deg, ${colors.primary[500]} 0%, ${colors.primary[600]} 100%)`,
-                border: 'none',
-                borderRadius: borderRadius.lg,
-                color: 'white',
-                fontSize: '14px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: transitions.normal,
-              }}
-              onMouseEnter={(e) => {
-                ;(e.target as HTMLButtonElement).style.transform = 'translateY(-2px)'
-                ;(e.target as HTMLButtonElement).style.boxShadow = shadows.lg
-              }}
-              onMouseLeave={(e) => {
-                ;(e.target as HTMLButtonElement).style.transform = 'translateY(0)'
-                ;(e.target as HTMLButtonElement).style.boxShadow = 'none'
-              }}
-            >
-              💳 Planos
-            </button>
-          </Link>
-
-          {/* Notification Bell */}
+        {/* Actions - Right */}
+        <div className="actions-section">
           {userId && <NotificationBell userId={userId} />}
-
-          {/* Settings Button */}
-          <Link href="/settings" style={{ textDecoration: 'none' }}>
-            <button
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: spacing.sm,
-                padding: `10px ${spacing.md}`,
-                background: colors.primary[50],
-                border: `1px solid ${colors.primary[200]}`,
-                borderRadius: borderRadius.lg,
-                color: colors.primary[600],
-                fontSize: '14px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: transitions.normal,
-              }}
-              onMouseEnter={(e) => {
-                ;(e.target as HTMLButtonElement).style.background = colors.primary[100]
-                ;(e.target as HTMLButtonElement).style.borderColor = colors.primary[300]
-              }}
-              onMouseLeave={(e) => {
-                ;(e.target as HTMLButtonElement).style.background = colors.primary[50]
-                ;(e.target as HTMLButtonElement).style.borderColor = colors.primary[200]
-              }}
-            >
-              <Settings size={16} />
-              <span>Configurações</span>
-            </button>
-          </Link>
-
-          {/* Logout Button */}
+          
           <button
-            onClick={handleLogout}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: spacing.sm,
-              padding: `10px ${spacing.md}`,
-              background: colors.primary[50],
-              border: `1px solid ${colors.primary[200]}`,
-              borderRadius: borderRadius.lg,
-              color: colors.primary[600],
-              fontSize: '14px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              transition: transitions.normal,
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = colors.primary[100]
-              e.currentTarget.style.borderColor = colors.primary[300]
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = colors.primary[50]
-              e.currentTarget.style.borderColor = colors.primary[200]
-            }}
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="action-button"
+            title="Menu"
           >
-            <LogOut size={16} />
-            <span>Sair</span>
+            <Menu size={20} />
           </button>
         </div>
-
-        {/* Mobile Menu Button */}
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          style={{
-            display: 'none',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            padding: spacing.md,
-            color: colors.secondary[600],
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.color = colors.secondary[900]}
-          onMouseLeave={(e) => e.currentTarget.style.color = colors.secondary[600]}
-        >
-          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
       </div>
 
       {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <div style={{
-          display: 'none',
-          padding: `${spacing.md} ${spacing.xl}`,
-          borderTop: `1px solid ${colors.primary[100]}`,
-          gap: spacing.md,
-          flexDirection: 'column',
-        }}>
-          <p style={{
-            fontSize: '14px',
-            color: colors.secondary[600],
-            margin: `${spacing.sm} 0`,
-          }}>
-            {userName}
-          </p>
-          <button
-            onClick={handleLogout}
-            style={{
-              width: '100%',
-              padding: `${spacing.sm} ${spacing.md}`,
-              background: colors.status.error,
-              color: colors.background.light,
-              border: 'none',
-              borderRadius: borderRadius.lg,
-              fontWeight: 600,
-              cursor: 'pointer',
-            }}
-          >
-            Sair
-          </button>
-        </div>
-      )}
+      <div className={`mobile-menu ${mobileMenuOpen ? 'open' : ''}`}>
+        <Link href="/settings" className="menu-item">
+          <Settings size={18} />
+          Configurações
+        </Link>
+        <button
+          onClick={handleLogout}
+          className="menu-item danger"
+          style={{ border: 'none', background: 'none', width: '100%', textAlign: 'left' }}
+        >
+          <LogOut size={18} />
+          Sair
+        </button>
+      </div>
     </header>
   )
 }

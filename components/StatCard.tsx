@@ -25,8 +25,8 @@ export default function StatCard({
       borderRadius: borderRadius.xl,
       boxShadow: shadows.md,
       border: `1px solid ${colors.primary[100]}`,
-      padding: `${spacing.lg} ${spacing.md}`,
-      minHeight: '120px',
+      padding: 'clamp(12px, 3vw, 24px) clamp(12px, 2vw, 16px)',
+      minHeight: 'clamp(100px, 25vw, 140px)',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'space-between',
@@ -34,10 +34,6 @@ export default function StatCard({
       overflow: 'hidden',
       transition: transitions.normal,
       cursor: 'pointer',
-      ':hover': {
-        boxShadow: shadows.lg,
-        transform: 'translateY(-2px)',
-      }
     } as React.CSSProperties}
       onMouseEnter={(e) => {
         e.currentTarget.style.boxShadow = shadows.lg
@@ -53,8 +49,8 @@ export default function StatCard({
         position: 'absolute',
         top: '-40px',
         right: '-40px',
-        width: '120px',
-        height: '120px',
+        width: 'clamp(100px, 15vw, 120px)',
+        height: 'clamp(100px, 15vw, 120px)',
         background: `radial-gradient(circle, ${backgroundColor}60 0%, transparent 70%)`,
         borderRadius: '50%',
         pointerEvents: 'none',
@@ -65,25 +61,32 @@ export default function StatCard({
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'flex-start',
-        marginBottom: spacing.sm,
+        marginBottom: 'clamp(8px, 1.5vw, 12px)',
         position: 'relative',
         zIndex: 1,
+        gap: 'clamp(8px, 2vw, 12px)',
       }}>
-        <div>
+        <div style={{ minWidth: 0, flex: 1 }}>
           <p style={{
-            fontSize: typography.small.fontSize,
+            fontSize: 'clamp(11px, 1.5vw, 12px)',
             color: colors.secondary[500],
             fontWeight: 600,
             margin: 0,
-            marginBottom: spacing.xs,
+            marginBottom: 'clamp(4px, 1vw, 6px)',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
           }}>
             {title}
           </p>
           {subtitle && (
             <p style={{
-              fontSize: '11px',
+              fontSize: 'clamp(10px, 1.2vw, 11px)',
               color: colors.secondary[400],
               margin: 0,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
             }}>
               {subtitle}
             </p>
@@ -91,8 +94,8 @@ export default function StatCard({
         </div>
 
         <div style={{
-          width: '48px',
-          height: '48px',
+          width: 'clamp(40px, 10vw, 48px)',
+          height: 'clamp(40px, 10vw, 48px)',
           background: backgroundColor,
           borderRadius: borderRadius.lg,
           display: 'flex',
@@ -111,14 +114,19 @@ export default function StatCard({
         justifyContent: 'space-between',
         position: 'relative',
         zIndex: 1,
+        gap: 'clamp(8px, 2vw, 12px)',
+        flexWrap: 'wrap',
       }}>
-        <div>
+        <div style={{ flex: 1, minWidth: 0 }}>
           <p style={{
-            fontSize: '24px',
+            fontSize: 'clamp(18px, 5vw, 24px)',
             fontWeight: 700,
             color: colors.secondary[900],
             margin: 0,
             lineHeight: '1.2',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
           }}>
             {value}
           </p>
@@ -128,10 +136,11 @@ export default function StatCard({
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: spacing.xs,
-            padding: `${spacing.xs} ${spacing.md}`,
+            gap: 'clamp(4px, 1vw, 6px)',
+            padding: `clamp(4px, 1vw, 6px) clamp(8px, 1.5vw, 12px)`,
             background: trend > 0 ? colors.status.success + '15' : colors.status.error + '15',
             borderRadius: borderRadius.md,
+            flexShrink: 0,
           }}>
             {trend > 0 ? (
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={colors.status.success} strokeWidth="2">
@@ -145,9 +154,10 @@ export default function StatCard({
               </svg>
             )}
             <span style={{
-              fontSize: '12px',
+              fontSize: 'clamp(10px, 1.5vw, 12px)',
               fontWeight: 600,
               color: trend > 0 ? colors.status.success : colors.status.error,
+              whiteSpace: 'nowrap',
             }}>
               {Math.abs(trend)}%
             </span>

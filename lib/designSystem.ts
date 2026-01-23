@@ -1,4 +1,25 @@
 // Design System - Consistent styling across the app
+// Mobile-first responsive approach
+
+// Breakpoints for responsive design (mobile-first)
+export const breakpoints = {
+  xs: 320,      // Extra small - Mobile phones
+  sm: 480,      // Small - Larger phones
+  md: 768,      // Medium - Tablets
+  lg: 1024,     // Large - Desktop
+  xl: 1280,     // Extra large - Wide screens
+  xxl: 1536,    // Ultra wide - TV screens
+}
+
+// Media query helpers
+export const mediaQueries = {
+  mobile: '@media (max-width: 479px)',
+  tablet: '@media (min-width: 480px)',
+  tabletUp: '@media (min-width: 768px)',
+  desktop: '@media (min-width: 1024px)',
+  desktopUp: '@media (min-width: 1024px)',
+  wide: '@media (min-width: 1280px)',
+}
 
 export const colors = {
   primary: {
@@ -39,47 +60,47 @@ export const colors = {
 }
 
 export const spacing = {
-  xs: '4px',
-  sm: '8px',
-  md: '16px',
-  lg: '24px',
-  xl: '32px',
-  xxl: '48px',
+  xs: 'clamp(2px, 1vw, 4px)',      // Responsive tiny spacing
+  sm: 'clamp(6px, 1.5vw, 8px)',    // Responsive small spacing
+  md: 'clamp(12px, 2vw, 16px)',    // Responsive medium spacing
+  lg: 'clamp(18px, 3vw, 24px)',    // Responsive large spacing
+  xl: 'clamp(24px, 4vw, 32px)',    // Responsive extra large spacing
+  xxl: 'clamp(32px, 5vw, 48px)',   // Responsive ultra large spacing
 }
 
 export const typography = {
   h1: {
-    fontSize: '36px',
+    fontSize: 'clamp(28px, 6vw, 36px)',
     fontWeight: 700,
     lineHeight: '1.2',
   },
   h2: {
-    fontSize: '28px',
+    fontSize: 'clamp(24px, 5vw, 28px)',
     fontWeight: 700,
     lineHeight: '1.3',
   },
   h3: {
-    fontSize: '24px',
+    fontSize: 'clamp(18px, 4vw, 24px)',
     fontWeight: 700,
     lineHeight: '1.4',
   },
   h4: {
-    fontSize: '20px',
+    fontSize: 'clamp(16px, 3vw, 20px)',
     fontWeight: 600,
     lineHeight: '1.5',
   },
   body: {
-    fontSize: '14px',
+    fontSize: 'clamp(13px, 2vw, 14px)',
     fontWeight: 400,
     lineHeight: '1.6',
   },
   small: {
-    fontSize: '12px',
+    fontSize: 'clamp(11px, 1.5vw, 12px)',
     fontWeight: 400,
     lineHeight: '1.5',
   },
   label: {
-    fontSize: '13px',
+    fontSize: 'clamp(12px, 1.5vw, 13px)',
     fontWeight: 600,
     lineHeight: '1.5',
   },

@@ -104,20 +104,36 @@ export default function DashboardPage() {
     <div style={{
       minHeight: '100vh',
       background: colors.background.lighter,
-      paddingBottom: spacing.xl,
+      paddingBottom: '20px',
+      width: '100%',
+      overflow: 'hidden',
     }}>
       <DashboardHeader userName={user.user_metadata?.name || user.email || 'Usuário'} onLogout={handleLogout} />
 
       {/* Main Content */}
       <main style={{
+        width: '100%',
         maxWidth: '100%',
         margin: '0 auto',
-        padding: `${spacing.md} ${spacing.sm}`,
+        padding: '12px',
+        boxSizing: 'border-box',
       } as React.CSSProperties}>
+        <style>{`
+          @media (min-width: 480px) {
+            main {
+              padding: 16px;
+            }
+          }
+          @media (min-width: 768px) {
+            main {
+              padding: 24px;
+            }
+          }
+        `}</style>
         <div style={{
           display: 'grid',
           gridTemplateColumns: '1fr',
-          gap: spacing.md,
+          gap: '12px',
           alignItems: 'start',
         } as React.CSSProperties}>
           {/* Left Column - Main Dashboard */}

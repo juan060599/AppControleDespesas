@@ -37,14 +37,10 @@ export default function Dashboard({ transactions, userId }: DashboardProps) {
   const [balance, setBalance] = useState(0)
 
   useEffect(() => {
-    // Get period dates
     const { startDate, endDate } = getPeriodDates(selectedPeriod)
-    
-    // Filter transactions by period
     const filtered = transactions.filter(t => t.date >= startDate && t.date <= endDate)
     setFilteredTransactions(filtered)
 
-    // Calculate totals
     let income = 0
     let expense = 0
 
@@ -59,244 +55,344 @@ export default function Dashboard({ transactions, userId }: DashboardProps) {
     setTotalIncome(income)
     setTotalExpense(expense)
     setBalance(income - expense)
-
-    // Calculate income vs expense summary
     setIncomeExpenseData([
       { name: 'Receitas', value: income },
       { name: 'Despesas', value: expense },
     ])
   }, [transactions, selectedPeriod])
 
-  const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899']
-
   return (
-    <div style={{ padding: 0 }}>
-      {/* Period Filter - Only visible in Overview tab */}
-      {activeTab === 'overview' && (
-        <div style={{
-          marginBottom: spacing.md,
-          marginTop: spacing.md,
-          display: 'flex',
-          gap: spacing.sm,
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          overflowX: 'auto',
-          paddingBottom: spacing.xs,
-        } as React.CSSProperties}>
-          <span style={{
-            fontSize: '13px',
-            fontWeight: 600,
-            color: colors.secondary[700],
-            whiteSpace: 'nowrap',
-          }}>
-            📅 Período:
-          </span>
-          {Object.entries(PERIOD_LABELS).map(([key, label]) => (
-            <button
-              key={key}
-              onClick={() => setSelectedPeriod(key as PeriodType)}
-              style={{
-                padding: `${spacing.xs} ${spacing.sm}`,
-                borderRadius: borderRadius.lg,
-                border: selectedPeriod === key ? `2px solid ${colors.primary[600]}` : `1px solid ${colors.secondary[200]}`,
-                background: selectedPeriod === key ? colors.primary[50] : 'white',
-                color: selectedPeriod === key ? colors.primary[600] : colors.secondary[700],
-                fontWeight: selectedPeriod === key ? 600 : 400,
-                cursor: 'pointer',
-                transition: transitions.normal,
-                fontSize: 'calc(12px + 0.5vw)',
-                minHeight: '36px',
-                whiteSpace: 'nowrap',
-              }}
-              onMouseOver={(e) => {
-                if (selectedPeriod !== key) {
-                  ;(e.target as any).style.background = colors.secondary[50]
-                  ;(e.target as any).style.borderColor = colors.secondary[300]
-                }
-              }}
-              onMouseOut={(e) => {
-                if (selectedPeriod !== key) {
-                  ;(e.target as any).style.background = 'white'
-                  ;(e.target as any).style.borderColor = colors.secondary[200]
-                }
-              }}
-            >
-              {label}
-            </button>
-          ))}
+    <div style={{ width: '100%', overflow: 'hidden' }}>
+      <style>{`
+        .dashboard-container {
+          width: 100%;
+          padding: 12px;
+        }
+        
+        @media (min-width: 480px) {
+          .dashboard-container {
+            padding: 16px;
+          }
+        }
+        
+        @media (min-width: 768px) {
+          .dashboard-container {
+            padding: 24px;
+          }
+        }
+
+        /* Period Filter */
+        .period-filter {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+          align-items: center;
+          margin-bottom: 20px;
+          margin-top: 16px;
+        }
+
+        .period-filter button {
+          padding: 6px 10px;
+          border-radius: 8px;
+          border: 1px solid #e5e7eb;
+          background: white;
+          color: #374151;
+          font-size: 11px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s;
+          min-height: 36px;
+          white-space: nowrap;
+          flex-shrink: 0;
+        }
+
+        .period-filter button:hover {
+          background: #f9fafb;
+          border-color: #d1d5db;
+        }
+
+        .period-filter button.active {
+          background: #f0f5ff;
+          border: 2px solid #2563eb;
+          color: #2563eb;
+          font-weight: 600;
+        }
+
+        @media (min-width: 480px) {
+          .period-filter button {
+            padding: 8px 12px;
+            font-size: 12px;
+          }
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 12px;
+          margin-bottom: 20px;
+        }
+
+        @media (min-width: 480px) {
+          .stats-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+          }
+        }
+
+        @media (min-width: 768px) {
+          .stats-grid {
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+          }
+        }
+
+        /* Chart Section */
+        .chart-section {
+          background: white;
+          border-radius: 12px;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+          border: 1px solid #e0ebff;
+          padding: 16px;
+          margin-bottom: 20px;
+        }
+
+        @media (min-width: 768px) {
+          .chart-section {
+            padding: 20px;
+            margin-bottom: 24px;
+          }
+        }
+
+        .chart-header {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 16px;
+        }
+
+        .chart-icon {
+          width: 44px;
+          height: 44px;
+          background: #e0ebff;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .chart-title {
+          font-size: 18px;
+          font-weight: 700;
+          color: #111827;
+          margin: 0;
+        }
+
+        @media (min-width: 768px) {
+          .chart-title {
+            font-size: 24px;
+          }
+        }
+
+        .chart-container {
+          width: 100%;
+          height: 200px;
+        }
+
+        @media (min-width: 480px) {
+          .chart-container {
+            height: 250px;
+          }
+        }
+
+        @media (min-width: 768px) {
+          .chart-container {
+            height: 300px;
+          }
+        }
+
+        /* Tabs */
+        .tabs-container {
+          border-bottom: 2px solid #e5e7eb;
+          display: flex;
+          gap: 12px;
+          margin-bottom: 20px;
+          flex-wrap: wrap;
+        }
+
+        @media (min-width: 768px) {
+          .tabs-container {
+            margin-bottom: 24px;
+          }
+        }
+
+        .tab-button {
+          padding: 12px 16px;
+          background: none;
+          border: none;
+          font-size: 14px;
+          font-weight: 500;
+          color: #6b7280;
+          cursor: pointer;
+          border-bottom: 3px solid transparent;
+          margin-bottom: -2px;
+          transition: all 0.2s;
+          white-space: nowrap;
+        }
+
+        @media (min-width: 480px) {
+          .tab-button {
+            padding: 14px 20px;
+            font-size: 15px;
+          }
+        }
+
+        .tab-button.active {
+          color: #2563eb;
+          border-bottom-color: #2563eb;
+          font-weight: 700;
+        }
+
+        /* Features Grid */
+        .features-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 12px;
+        }
+
+        @media (min-width: 768px) {
+          .features-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+          }
+        }
+      `}</style>
+
+      <div className="dashboard-container">
+        {/* Period Filter */}
+        {activeTab === 'overview' && (
+          <div className="period-filter">
+            <span style={{
+              fontSize: '12px',
+              fontWeight: 600,
+              color: '#374151',
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+            }}>
+              📅 Período:
+            </span>
+            {Object.entries(PERIOD_LABELS).map(([key, label]) => (
+              <button
+                key={key}
+                onClick={() => setSelectedPeriod(key as PeriodType)}
+                className={`${selectedPeriod === key ? 'active' : ''}`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Stats Cards Grid */}
+        <div className="stats-grid">
+          <StatCard
+            title="Receitas"
+            value={`R$ ${totalIncome.toFixed(2)}`}
+            icon={<TrendingUp size={24} color="#10b981" />}
+            backgroundColor="#d1fae520"
+            trend={5}
+            subtitle="Última semana"
+          />
+          <StatCard
+            title="Despesas"
+            value={`R$ ${totalExpense.toFixed(2)}`}
+            icon={<TrendingDown size={24} color="#ef4444" />}
+            backgroundColor="#fee2e220"
+            trend={-3}
+            subtitle="Última semana"
+          />
+          <StatCard
+            title="Saldo"
+            value={`R$ ${balance.toFixed(2)}`}
+            icon={<BarChart3 size={24} color="#2563eb" />}
+            backgroundColor="#dbeafe"
+            subtitle="Disponível"
+            trend={balance > 0 ? 8 : -2}
+          />
         </div>
-      )}
 
-      {/* Stats Cards Section */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
-        gap: spacing.md,
-        marginBottom: spacing.xl,
-      } as React.CSSProperties}>
-        <StatCard
-          title="Receitas"
-          value={`R$ ${totalIncome.toFixed(2)}`}
-          icon={<TrendingUp size={24} color={colors.status.success} />}
-          backgroundColor={colors.status.success + '20'}
-          trend={5}
-          subtitle="Última semana"
-        />
-        <StatCard
-          title="Despesas"
-          value={`R$ ${totalExpense.toFixed(2)}`}
-          icon={<TrendingDown size={24} color={colors.status.error} />}
-          backgroundColor={colors.status.error + '20'}
-          trend={-3}
-          subtitle="Última semana"
-        />
-        <StatCard
-          title="Saldo"
-          value={`R$ ${balance.toFixed(2)}`}
-          icon={<BarChart3 size={24} color={colors.primary[600]} />}
-          backgroundColor={colors.primary[100]}
-          subtitle="Disponível"
-          trend={balance > 0 ? 8 : -2}
-        />
-      </div>
-
-      {/* Charts Grid */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 400px), 1fr))',
-        gap: spacing.md,
-        marginBottom: spacing.xl,
-      } as React.CSSProperties}>
-        {/* Income vs Expense */}
-        <div style={{
-          ...{
-            background: colors.background.light,
-            borderRadius: borderRadius.xl,
-            boxShadow: shadows.md,
-            border: `1px solid ${colors.primary[100]}`,
-            padding: spacing.md,
-            overflowX: 'auto',
-          } as React.CSSProperties
-        }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: spacing.md,
-            marginBottom: spacing.lg,
-          }}>
-            <div style={{
-              width: '44px',
-              height: '44px',
-              background: colors.primary[100],
-              borderRadius: borderRadius.lg,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-              <BarChart3 size={24} color={colors.primary[600]} />
+        {/* Chart Section */}
+        <div className="chart-section">
+          <div className="chart-header">
+            <div className="chart-icon">
+              <BarChart3 size={20} color="#2563eb" />
             </div>
-            <h2 style={{
-              fontSize: typography.h3.fontSize,
-              fontWeight: 700,
-              color: colors.secondary[900],
-              margin: 0,
-            }}>
-              Receitas vs Despesas
-            </h2>
+            <h2 className="chart-title">Receitas vs Despesas</h2>
           </div>
 
           {incomeExpenseData.length > 0 && (incomeExpenseData[0].value > 0 || incomeExpenseData[1].value > 0) ? (
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={incomeExpenseData}>
-                <CartesianGrid strokeDasharray="3 3" stroke={colors.secondary[200]} />
-                <XAxis dataKey="name" stroke={colors.secondary[500]} />
-                <YAxis stroke={colors.secondary[500]} />
-                <Tooltip 
-                  formatter={(value: any) => `R$ ${value.toFixed(2)}`}
-                  contentStyle={{
-                    background: colors.background.light,
-                    border: `1px solid ${colors.secondary[200]}`,
-                    borderRadius: borderRadius.lg,
-                  }}
-                />
-                <Bar dataKey="value" fill={colors.primary[500]} radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="chart-container">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={incomeExpenseData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="name" stroke="#6b7280" fontSize={12} />
+                  <YAxis stroke="#6b7280" fontSize={12} />
+                  <Tooltip
+                    formatter={(value: any) => `R$ ${value.toFixed(2)}`}
+                    contentStyle={{
+                      background: '#ffffff',
+                      border: `1px solid #e5e7eb`,
+                      borderRadius: '8px',
+                      fontSize: '12px',
+                    }}
+                  />
+                  <Bar dataKey="value" fill="#3b82f6" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           ) : (
             <p style={{
-              color: colors.secondary[400],
+              color: '#9ca3af',
               textAlign: 'center',
-              padding: `${spacing.xl} 0`,
+              padding: '32px 0',
               margin: 0,
+              fontSize: '14px',
             }}>
               Sem dados
             </p>
           )}
         </div>
-      </div>
 
-      {/* Tabs */}
-      <div style={{
-        borderBottom: `2px solid ${colors.secondary[200]}`,
-        display: 'flex',
-        gap: spacing.lg,
-        marginBottom: spacing.xl,
-      }}>
-        <button
-          onClick={() => setActiveTab('overview')}
-          style={{
-            padding: `${spacing.md} ${spacing.lg}`,
-            background: 'none',
-            border: 'none',
-            fontSize: typography.h4.fontSize,
-            fontWeight: activeTab === 'overview' ? 700 : 500,
-            color: activeTab === 'overview' ? colors.primary[600] : colors.secondary[500],
-            cursor: 'pointer',
-            borderBottom: activeTab === 'overview' ? `3px solid ${colors.primary[600]}` : 'none',
-            marginBottom: '-2px',
-            transition: `all ${transitions.normal}`,
-          }}
-        >
-          📊 Visão Geral
-        </button>
-        <button
-          onClick={() => setActiveTab('insights')}
-          style={{
-            padding: `${spacing.md} ${spacing.lg}`,
-            background: 'none',
-            border: 'none',
-            fontSize: typography.h4.fontSize,
-            fontWeight: activeTab === 'insights' ? 700 : 500,
-            color: activeTab === 'insights' ? colors.primary[600] : colors.secondary[500],
-            cursor: 'pointer',
-            borderBottom: activeTab === 'insights' ? `3px solid ${colors.primary[600]}` : 'none',
-            marginBottom: '-2px',
-            transition: `all ${transitions.normal}`,
-          }}
-        >
-          💡 Insights
-        </button>
-      </div>
+        {/* Tabs */}
+        <div className="tabs-container">
+          <button
+            onClick={() => setActiveTab('overview')}
+            className={`tab-button ${activeTab === 'overview' ? 'active' : ''}`}
+          >
+            📊 Visão Geral
+          </button>
+          <button
+            onClick={() => setActiveTab('insights')}
+            className={`tab-button ${activeTab === 'insights' ? 'active' : ''}`}
+          >
+            💡 Insights
+          </button>
+        </div>
 
-      {/* Content */}
-      {activeTab === 'overview' && (
-        <>
-          {/* Features Section: Recurring Expenses & Financial Goals */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 350px), 1fr))',
-            gap: spacing.md,
-            marginBottom: spacing.xl,
-          } as React.CSSProperties}>
+        {/* Content */}
+        {activeTab === 'overview' && (
+          <div className="features-grid">
             <RecurringExpenses userId={userId} />
             <FinancialGoals userId={userId} />
           </div>
-        </>
-      )}
+        )}
 
-      {activeTab === 'insights' && (
-        <Insights userId={userId} allTransactions={transactions} />
-      )}
+        {activeTab === 'insights' && (
+          <Insights userId={userId} allTransactions={transactions} />
+        )}
+      </div>
     </div>
   )
 }

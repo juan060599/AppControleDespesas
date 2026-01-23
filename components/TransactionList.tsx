@@ -75,25 +75,26 @@ export default function TransactionList({ transactions }: TransactionListProps) 
     }}>
       {/* Header */}
       <div style={{
-        padding: `${spacing.lg} ${spacing.xl}`,
+        padding: `clamp(12px, 2vw, 24px) clamp(12px, 3vw, 32px)`,
         borderBottom: `1px solid ${colors.primary[100]}`,
         display: 'flex',
         alignItems: 'center',
-        gap: spacing.md,
+        gap: 'clamp(12px, 2vw, 16px)',
       }}>
         <div style={{
-          width: '44px',
-          height: '44px',
+          width: 'clamp(36px, 8vw, 44px)',
+          height: 'clamp(36px, 8vw, 44px)',
           background: colors.primary[100],
           borderRadius: borderRadius.lg,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          flexShrink: 0,
         }}>
-          <Calendar size={24} color={colors.primary[600]} />
+          <Calendar size={20} color={colors.primary[600]} />
         </div>
         <h2 style={{
-          fontSize: typography.h3.fontSize,
+          fontSize: 'clamp(16px, 4vw, 24px)',
           fontWeight: 700,
           color: colors.secondary[900],
           margin: 0,
@@ -106,12 +107,12 @@ export default function TransactionList({ transactions }: TransactionListProps) 
       <div>
         {transactions.length === 0 ? (
           <div style={{
-            padding: spacing.xxl,
+            padding: 'clamp(32px, 6vw, 48px)',
             textAlign: 'center',
             color: colors.secondary[400],
           }}>
             <p style={{
-              fontSize: typography.body.fontSize,
+              fontSize: 'clamp(12px, 2vw, 14px)',
               margin: 0,
             }}>
               Nenhuma transação registrada
@@ -126,9 +127,11 @@ export default function TransactionList({ transactions }: TransactionListProps) 
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  padding: spacing.lg,
+                  padding: 'clamp(12px, 2vw, 16px) clamp(12px, 3vw, 32px)',
                   borderBottom: index < transactions.length - 1 ? `1px solid ${colors.secondary[100]}` : 'none',
                   transition: transitions.normal,
+                  flexWrap: 'wrap',
+                  gap: 'clamp(8px, 2vw, 12px)',
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = colors.secondary[50]
@@ -141,13 +144,14 @@ export default function TransactionList({ transactions }: TransactionListProps) 
                 <div style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: spacing.lg,
+                  gap: 'clamp(12px, 2vw, 16px)',
                   flex: 1,
+                  minWidth: 0,
                 }}>
                   {/* Icon */}
                   <div style={{
-                    width: '48px',
-                    height: '48px',
+                    width: 'clamp(40px, 10vw, 48px)',
+                    height: 'clamp(40px, 10vw, 48px)',
                     background: transaction.type === 'income' ? colors.status.success + '20' : colors.status.error + '20',
                     borderRadius: borderRadius.lg,
                     display: 'flex',
@@ -156,44 +160,53 @@ export default function TransactionList({ transactions }: TransactionListProps) 
                     flexShrink: 0,
                   }}>
                     {transaction.type === 'income' ? (
-                      <ArrowUpRight size={24} color={colors.status.success} />
+                      <ArrowUpRight size={20} color={colors.status.success} />
                     ) : (
-                      <ArrowDownLeft size={24} color={colors.status.error} />
+                      <ArrowDownLeft size={20} color={colors.status.error} />
                     )}
                   </div>
 
                   {/* Details */}
-                  <div style={{ flex: 1 }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{
-                      fontSize: typography.body.fontSize,
+                      fontSize: 'clamp(13px, 2vw, 14px)',
                       fontWeight: 600,
                       color: colors.secondary[900],
                       margin: 0,
-                      marginBottom: spacing.xs,
+                      marginBottom: 'clamp(4px, 1vw, 6px)',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
                     }}>
                       {transaction.description}
                     </p>
                     <div style={{
                       display: 'flex',
-                      gap: spacing.md,
+                      gap: 'clamp(8px, 2vw, 12px)',
                       alignItems: 'center',
+                      flexWrap: 'wrap',
                     }}>
                       <span style={{
-                        fontSize: typography.small.fontSize,
+                        fontSize: 'clamp(11px, 1.5vw, 12px)',
                         color: colors.secondary[500],
                         display: 'flex',
                         alignItems: 'center',
-                        gap: spacing.xs,
+                        gap: 'clamp(4px, 1vw, 6px)',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
                       }}>
-                        <Tag size={14} />
+                        <Tag size={12} />
                         {transaction.category}
                       </span>
                       <span style={{
-                        fontSize: typography.small.fontSize,
+                        fontSize: 'clamp(11px, 1.5vw, 12px)',
                         color: colors.secondary[500],
                         display: 'flex',
                         alignItems: 'center',
-                        gap: spacing.xs,
+                        gap: 'clamp(4px, 1vw, 6px)',
+                        whiteSpace: 'nowrap',
+
                       }}>
                         <Calendar size={14} />
                         {formatDate(transaction.date)}
