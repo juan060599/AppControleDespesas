@@ -10,7 +10,8 @@ const withPWA = require('next-pwa')({
 
 const nextConfig = {
   reactStrictMode: true,
-  output: 'export', // Para gerar HTML estático em ./out
+  // Removido output: 'export' para permitir API routes no Vercel
+  // Vercel vai fazer SSG automático das páginas estáticas
 }
 
 module.exports = withPWA(nextConfig)
