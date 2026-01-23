@@ -91,9 +91,22 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', background: colors.background.lighter }}>
+      <div style={{ minHeight: '100vh', background: colors.background.lighter, width: '100%', overflow: 'hidden' }}>
         <DashboardHeader userName={user?.email || 'Usuário'} onLogout={handleLogout} />
-        <main style={{ maxWidth: '1200px', margin: '0 auto', padding: spacing.xl }}>
+        <main style={{ width: '100%', maxWidth: '100%', margin: '0 auto', padding: '12px', boxSizing: 'border-box' }}>
+          <style>{`
+            @media (min-width: 480px) {
+              main {
+                padding: 16px;
+              }
+            }
+            @media (min-width: 768px) {
+              main {
+                padding: 24px;
+                max-width: 1200px;
+              }
+            }
+          `}</style>
           <p style={{ color: colors.secondary[500], textAlign: 'center' }}>Carregando...</p>
         </main>
       </div>
@@ -101,206 +114,408 @@ export default function SettingsPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: colors.background.lighter }}>
+    <div style={{ minHeight: '100vh', background: colors.background.lighter, width: '100%', overflow: 'hidden' }}>
       <DashboardHeader userName={user?.email || 'Usuário'} onLogout={handleLogout} />
 
-      <main style={{ maxWidth: '1200px', margin: '0 auto', padding: spacing.xl }}>
-        {/* Botão voltar */}
-        <button
-          onClick={() => router.back()}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: spacing.sm,
-            padding: `${spacing.sm} ${spacing.md}`,
-            backgroundColor: 'transparent',
-            border: `1px solid ${colors.primary[200]}`,
-            borderRadius: '6px',
-            cursor: 'pointer',
-            color: colors.primary[500],
-            fontWeight: 'bold',
-            marginBottom: spacing.lg,
-            transition: 'all 0.3s ease',
-          }}
-          onMouseEnter={(e) => {
-            ;(e.target as HTMLButtonElement).style.backgroundColor = colors.primary[50]
-          }}
-          onMouseLeave={(e) => {
-            ;(e.target as HTMLButtonElement).style.backgroundColor = 'transparent'
-          }}
-        >
-          <ArrowLeft size={20} />
-          Voltar
-        </button>
+      <main style={{ width: '100%', maxWidth: '100%', margin: '0 auto', padding: '12px', boxSizing: 'border-box' }}>
+        <style>{`
+          .settings-main {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 12px;
+            box-sizing: border-box;
+            overflow: hidden;
+          }
 
-        {/* Título */}
-        <h1 style={{ ...typography.h1, margin: `0 0 ${spacing.lg} 0`, color: colors.secondary[900] }}>
-          ⚙️ Configurações
-        </h1>
+          @media (min-width: 480px) {
+            .settings-main {
+              padding: 16px;
+            }
+          }
 
-        {/* Seções */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
-            gap: spacing.xl,
-          }}
-        >
-          {/* API Key - Apenas para Admin */}
-          {userRole === 'admin' && (
-            <section>
-              <ApiKeySettings />
-            </section>
-          )}
+          @media (min-width: 768px) {
+            .settings-main {
+              padding: 24px;
+              max-width: 1200px;
+              margin: 0 auto;
+            }
+          }
 
-          {/* Informações da Conta */}
-          <section
+          .back-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background-color: transparent;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+          }
+
+          @media (min-width: 480px) {
+            .back-button {
+              font-size: 15px;
+            }
+          }
+
+          .settings-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 0 0 16px 0;
+            margin-bottom: 20px;
+          }
+
+          @media (min-width: 480px) {
+            .settings-title {
+              font-size: 28px;
+              margin-bottom: 24px;
+            }
+          }
+
+          @media (min-width: 768px) {
+            .settings-title {
+              font-size: 32px;
+              margin-bottom: 32px;
+            }
+          }
+
+          .settings-sections {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            width: 100%;
+          }
+
+          @media (min-width: 480px) {
+            .settings-sections {
+              gap: 20px;
+            }
+          }
+
+          @media (min-width: 768px) {
+            .settings-sections {
+              grid-template-columns: repeat(2, 1fr);
+              gap: 24px;
+            }
+          }
+
+          .settings-card {
+            padding: 16px;
+            background-color: #f5f5f5;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            width: 100%;
+            box-sizing: border-box;
+          }
+
+          @media (min-width: 480px) {
+            .settings-card {
+              padding: 20px;
+            }
+          }
+
+          @media (min-width: 768px) {
+            .settings-card {
+              padding: 24px;
+            }
+          }
+
+          .settings-card h3 {
+            font-size: 16px;
+            font-weight: bold;
+            margin: 0 0 12px 0;
+          }
+
+          @media (min-width: 480px) {
+            .settings-card h3 {
+              font-size: 18px;
+              margin-bottom: 16px;
+            }
+          }
+
+          .settings-input, .settings-select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+            margin-bottom: 12px;
+          }
+
+          @media (min-width: 480px) {
+            .settings-input, .settings-select {
+              font-size: 15px;
+              padding: 14px;
+              margin-bottom: 16px;
+            }
+          }
+
+          .settings-button {
+            width: 100%;
+            padding: 12px;
+            background-color: #ffa500;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+          }
+
+          @media (min-width: 480px) {
+            .settings-button {
+              padding: 14px;
+              font-size: 15px;
+            }
+          }
+
+          .settings-label {
+            font-size: 12px;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 6px;
+            color: #333;
+          }
+
+          @media (min-width: 480px) {
+            .settings-label {
+              font-size: 13px;
+              margin-bottom: 8px;
+            }
+          }
+
+          .info-section {
+            margin-bottom: 12px;
+          }
+
+          @media (min-width: 480px) {
+            .info-section {
+              margin-bottom: 16px;
+            }
+          }
+
+          .info-label {
+            font-size: 12px;
+            color: #666;
+            margin: 0 0 4px 0;
+          }
+
+          @media (min-width: 480px) {
+            .info-label {
+              font-size: 13px;
+              margin-bottom: 6px;
+            }
+          }
+
+          .info-value {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+            word-break: break-all;
+          }
+
+          @media (min-width: 480px) {
+            .info-value {
+              font-size: 15px;
+            }
+          }
+
+          .admin-section {
+            background-color: #fff3cd;
+            border-color: #ffc107;
+          }
+
+          .category-limits-wrapper {
+            margin-top: 20px;
+            width: 100%;
+          }
+
+          @media (min-width: 480px) {
+            .category-limits-wrapper {
+              margin-top: 24px;
+            }
+          }
+
+          @media (min-width: 768px) {
+            .category-limits-wrapper {
+              margin-top: 32px;
+            }
+          }
+
+          .danger-zone-wrapper {
+            margin-top: 20px;
+            width: 100%;
+          }
+
+          @media (min-width: 480px) {
+            .danger-zone-wrapper {
+              margin-top: 24px;
+            }
+          }
+
+          @media (min-width: 768px) {
+            .danger-zone-wrapper {
+              margin-top: 32px;
+            }
+          }
+        `}</style>
+
+        <div className="settings-main">
+          {/* Botão voltar */}
+          <button
+            onClick={() => router.back()}
+            className="back-button"
             style={{
-              padding: spacing.lg,
-              backgroundColor: colors.background.light,
-              borderRadius: '12px',
-              border: `1px solid ${colors.primary[100]}`,
+              color: colors.primary[500],
+            }}
+            onMouseEnter={(e) => {
+              ;(e.target as HTMLButtonElement).style.backgroundColor = colors.primary[50]
+            }}
+            onMouseLeave={(e) => {
+              ;(e.target as HTMLButtonElement).style.backgroundColor = 'transparent'
             }}
           >
-            <h3 style={{ ...typography.h3, margin: `0 0 ${spacing.md} 0`, color: colors.secondary[900] }}>
-              👤 Informações da Conta
-            </h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.md }}>
-              <div>
-                <p style={{ ...typography.small, margin: 0, color: colors.secondary[500], marginBottom: spacing.xs }}>
-                  Email
-                </p>
-                <p style={{ ...typography.body, margin: 0, color: colors.secondary[900], fontWeight: 'bold' }}>
-                  {user?.email}
-                </p>
-              </div>
-              <div>
-                <p style={{ ...typography.small, margin: 0, color: colors.secondary[500], marginBottom: spacing.xs }}>
-                  Tipo de Usuário
-                </p>
-                <p style={{ ...typography.body, margin: 0, color: userRole === 'admin' ? colors.status.warning : colors.status.success, fontWeight: 'bold' }}>
-                  {userRole === 'admin' ? '👑 Administrador' : '👤 Cliente'}
-                </p>
-              </div>
-              <div>
-                <p style={{ ...typography.small, margin: 0, color: colors.secondary[500], marginBottom: spacing.xs }}>
-                  ID do Usuário
-                </p>
-                <p style={{ ...typography.small, margin: 0, color: colors.secondary[700], fontFamily: 'monospace', wordBreak: 'break-all' }}>
-                  {user?.id}
-                </p>
-              </div>
-            </div>
-          </section>
+            <ArrowLeft size={18} />
+            Voltar
+          </button>
 
-          {/* Painel Admin - Apenas para Admin */}
-          {userRole === 'admin' && (
-            <section
-              style={{
-                padding: spacing.lg,
-                backgroundColor: colors.status.warning + '15',
-                borderRadius: '12px',
-                border: `1px solid ${colors.status.warning}`,
-              }}
-            >
-              <h3 style={{ ...typography.h3, margin: `0 0 ${spacing.md} 0`, color: colors.secondary[900] }}>
-                👑 Painel de Admin
+          {/* Título */}
+          <h1 className="settings-title" style={{ color: colors.secondary[900] }}>
+            ⚙️ Configurações
+          </h1>
+
+          {/* Seções */}
+          <div className="settings-sections">
+            {/* API Key - Apenas para Admin */}
+            {userRole === 'admin' && (
+              <section style={{ gridColumn: 'span 1' }}>
+                <ApiKeySettings />
+              </section>
+            )}
+
+            {/* Informações da Conta */}
+            <section className="settings-card" style={{ borderColor: colors.primary[100], backgroundColor: colors.background.light }}>
+              <h3 style={{ color: colors.secondary[900] }}>
+                👤 Informações da Conta
               </h3>
-              <p style={{ ...typography.small, margin: `0 0 ${spacing.md} 0`, color: colors.secondary[600] }}>
-                Altere o tipo de usuário (admin ou cliente) pelo email
-              </p>
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.md }}>
-                <div>
-                  <label style={{ ...typography.small, color: colors.secondary[700], fontWeight: 'bold', display: 'block', marginBottom: spacing.xs }}>
-                    Email do Usuário
-                  </label>
-                  <input
-                    type="email"
-                    value={userEmail}
-                    onChange={(e) => setUserEmail(e.target.value)}
-                    placeholder="usuario@example.com"
-                    style={{
-                      width: '100%',
-                      padding: spacing.md,
-                      border: `1px solid ${colors.primary[200]}`,
-                      borderRadius: '6px',
-                      fontSize: typography.body.fontSize,
-                      fontFamily: 'inherit',
-                      boxSizing: 'border-box',
-                    }}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ ...typography.small, color: colors.secondary[700], fontWeight: 'bold', display: 'block', marginBottom: spacing.xs }}>
-                    Novo Tipo
-                  </label>
-                  <select
-                    value={newRole}
-                    onChange={(e) => setNewRole(e.target.value as 'admin' | 'cliente')}
-                    style={{
-                      width: '100%',
-                      padding: spacing.md,
-                      border: `1px solid ${colors.primary[200]}`,
-                      borderRadius: '6px',
-                      fontSize: typography.body.fontSize,
-                      fontFamily: 'inherit',
-                      boxSizing: 'border-box',
-                    }}
-                  >
-                    <option value="cliente">👤 Cliente</option>
-                    <option value="admin">👑 Administrador</option>
-                  </select>
-                </div>
-
-                <button
-                  onClick={handleUpdateRole}
-                  style={{
-                    padding: spacing.md,
-                    backgroundColor: colors.status.warning,
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: '6px',
-                    fontWeight: 'bold',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                  }}
-                  onMouseEnter={(e) => {
-                    ;(e.target as HTMLButtonElement).style.opacity = '0.9'
-                  }}
-                  onMouseLeave={(e) => {
-                    ;(e.target as HTMLButtonElement).style.opacity = '1'
-                  }}
-                >
-                  Atualizar Tipo de Usuário
-                </button>
-
-                {updateMessage && (
-                  <p style={{ ...typography.small, margin: 0, color: updateMessage.includes('✅') ? colors.status.success : colors.status.error }}>
-                    {updateMessage}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div className="info-section">
+                  <p className="info-label" style={{ color: colors.secondary[500] }}>
+                    Email
                   </p>
-                )}
+                  <p className="info-value" style={{ color: colors.secondary[900] }}>
+                    {user?.email}
+                  </p>
+                </div>
+                <div className="info-section">
+                  <p className="info-label" style={{ color: colors.secondary[500] }}>
+                    Tipo de Usuário
+                  </p>
+                  <p className="info-value" style={{ color: userRole === 'admin' ? colors.status.warning : colors.status.success }}>
+                    {userRole === 'admin' ? '👑 Administrador' : '👤 Cliente'}
+                  </p>
+                </div>
+                <div className="info-section">
+                  <p className="info-label" style={{ color: colors.secondary[500] }}>
+                    ID do Usuário
+                  </p>
+                  <p className="info-value" style={{ color: colors.secondary[700], fontFamily: 'monospace', fontSize: '12px' }}>
+                    {user?.id}
+                  </p>
+                </div>
               </div>
             </section>
-          )}
-        </div>
 
-        {/* Category Limits Management */}
-        <div style={{ marginTop: spacing.xl }}>
-          <CategoryLimits 
-            userId={user.id} 
-            onLimitsUpdated={() => setRefreshTrigger((prev) => prev + 1)}
-          />
-        </div>
+            {/* Painel Admin - Apenas para Admin */}
+            {userRole === 'admin' && (
+              <section className="settings-card admin-section" style={{ gridColumn: 'span 1' }}>
+                <h3 style={{ color: colors.secondary[900] }}>
+                  👑 Painel de Admin
+                </h3>
+                <p style={{ fontSize: '12px', margin: '0 0 12px 0', color: colors.secondary[600] }}>
+                  Altere o tipo de usuário (admin ou cliente) pelo email
+                </p>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div>
+                    <label className="settings-label">
+                      Email do Usuário
+                    </label>
+                    <input
+                      type="email"
+                      value={userEmail}
+                      onChange={(e) => setUserEmail(e.target.value)}
+                      placeholder="usuario@example.com"
+                      className="settings-input"
+                    />
+                  </div>
 
-        {/* Danger Zone */}
-        <DangerZone onDeleteSuccess={() => {
-          setRefreshTrigger((prev) => prev + 1)
-          setTimeout(() => {
-            router.push('/dashboard')
-          }, 1500)
-        }} />
+                  <div>
+                    <label className="settings-label">
+                      Novo Tipo
+                    </label>
+                    <select
+                      value={newRole}
+                      onChange={(e) => setNewRole(e.target.value as 'admin' | 'cliente')}
+                      className="settings-select"
+                    >
+                      <option value="cliente">👤 Cliente</option>
+                      <option value="admin">👑 Administrador</option>
+                    </select>
+                  </div>
+
+                  <button
+                    onClick={handleUpdateRole}
+                    className="settings-button"
+                    style={{
+                      backgroundColor: colors.status.warning,
+                    }}
+                    onMouseEnter={(e) => {
+                      ;(e.target as HTMLButtonElement).style.opacity = '0.9'
+                    }}
+                    onMouseLeave={(e) => {
+                      ;(e.target as HTMLButtonElement).style.opacity = '1'
+                    }}
+                  >
+                    Atualizar Tipo de Usuário
+                  </button>
+
+                  {updateMessage && (
+                    <p style={{ fontSize: '12px', margin: 0, color: updateMessage.includes('✅') ? colors.status.success : colors.status.error }}>
+                      {updateMessage}
+                    </p>
+                  )}
+                </div>
+              </section>
+            )}
+          </div>
+
+          {/* Category Limits Management */}
+          <div className="category-limits-wrapper">
+            <CategoryLimits 
+              userId={user.id} 
+              onLimitsUpdated={() => setRefreshTrigger((prev) => prev + 1)}
+            />
+          </div>
+
+          {/* Danger Zone */}
+          <div className="danger-zone-wrapper">
+            <DangerZone onDeleteSuccess={() => {
+              setRefreshTrigger((prev) => prev + 1)
+              setTimeout(() => {
+                router.push('/dashboard')
+              }, 1500)
+            }} />
+          </div>
+        </div>
       </main>
     </div>
   )
