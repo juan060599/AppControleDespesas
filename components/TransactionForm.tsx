@@ -40,10 +40,12 @@ export default function TransactionForm({ onTransactionAdded }: TransactionFormP
 
     if (!description || !amount || !userId) {
       setError('Preencha todos os campos')
+      console.error('[TransactionForm] Campos obrigatórios:', { description, amount, userId })
       return
     }
 
     setLoading(true)
+    console.log('[TransactionForm] Adicionando transação:', { userId, description, amount, type, category })
 
     const { error: addError } = await addTransaction({
       user_id: userId,
@@ -55,8 +57,10 @@ export default function TransactionForm({ onTransactionAdded }: TransactionFormP
     })
 
     if (addError) {
+      console.error('[TransactionForm] Erro ao adicionar:', addError)
       setError(addError.message)
     } else {
+      console.log('[TransactionForm] Transação adicionada com sucesso')
       setDescription('')
       setAmount('')
       setCategory(type === 'expense' ? EXPENSE_CATEGORIES[0] : INCOME_CATEGORIES[0])
