@@ -17,20 +17,24 @@ export default function PricingPage() {
   useEffect(() => {
     const loadUser = async () => {
       try {
+        setLoading(true)
         const currentUser = await getCurrentUser()
+        
         if (!currentUser) {
-          // Give a small delay to ensure session is loaded
+          // Give more time to ensure session is loaded on mobile
           setTimeout(() => {
             router.push('/signin')
-          }, 500)
+          }, 1000)
           return
         }
+        
         setUser(currentUser)
+        setLoading(false)
       } catch (error) {
         console.error('Error loading user:', error)
-        router.push('/signin')
-      } finally {
-        setLoading(false)
+        setTimeout(() => {
+          router.push('/signin')
+        }, 500)
       }
     }
 

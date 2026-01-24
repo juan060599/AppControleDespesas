@@ -1,4 +1,6 @@
 import { supabase } from './supabase'
+import { Capacitor } from '@capacitor/core'
+import { waitForAuthAndGetUser } from './capacitorAuth'
 
 export interface User {
   id: string
@@ -64,6 +66,15 @@ export async function signOut() {
 
 export async function getCurrentUser() {
   try {
+    // On Capacitor/mobile, wait for auth to be initialized
+    if (Capacitor.isNativePlatform()) {
+      const user = await waitForAuthAndGetUser()
+      if (user) {
+        return user
+      }
+    }
+    
+    // Regular flow for web
     const { data } = await supabase.auth.getSession()
     
     if (!data?.session?.user) {
