@@ -1,45 +1,23 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { getCurrentUser } from '@/lib/database'
+import { useAuthUser } from '@/lib/useAuthUser'
 import DashboardHeader from '@/components/DashboardHeader'
 import { colors, spacing, typography, shadows, borderRadius, transitions } from '@/lib/designSystem'
 import { Check, Loader, ArrowLeft } from 'lucide-react'
 
 export default function PricingPage() {
-  const [user, setUser] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+  const { user, loading } = useAuthUser()
   const [processing, setProcessing] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
 
-  useEffect(() => {
-    const loadUser = async () => {
-      try {
-        setLoading(true)
-        const currentUser = await getCurrentUser()
-        
-        if (!currentUser) {
-          // Give more time to ensure session is loaded on mobile
-          setTimeout(() => {
-            router.push('/signin')
-          }, 1000)
-          return
-        }
-        
-        setUser(currentUser)
-        setLoading(false)
-      } catch (error) {
-        console.error('Error loading user:', error)
-        setTimeout(() => {
-          router.push('/signin')
-        }, 500)
-      }
-    }
-
-    loadUser()
-  }, [router])
+  // Redirect to signin if no user and not loading
+  if (!loading && !user) {
+    router.push('/signin')
+    return null
+  }
 
   const handleCheckout = async () => {
     setProcessing(true)

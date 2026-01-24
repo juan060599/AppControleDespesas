@@ -2,54 +2,84 @@ import { supabase } from './supabase'
 import { Capacitor } from '@capacitor/core'
 
 let authInitialized = false
-let authPromise: Promise<boolean> | null = null
+let sessionRestored = false
+let authPromise: Promise<void> | null = null
 
 // Initialize Supabase session on Capacitor
 export async function initializeCapacitorAuth() {
-  if (authInitialized && authPromise) {
+  if (authPromise) {
     return authPromise
   }
 
   authPromise = (async () => {
     try {
-      // Restore session from Supabase
+      if (authInitialized) {
+        return
+      }
+
+      // Subscribe to auth state changes
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(
+        async (event, session) => {
+          sessionRestored = true
+          console.log('Auth state changed:', event, !!session)
+        }
+      )
+
+      // Try to restore session
       const { data, error } = await supabase.auth.getSession()
       
       if (error) {
         console.error('Error restoring session:', error)
-        return false
+      } else if (data?.session) {
+        sessionRestored = true
+        console.log('Session restored successfully')
       }
 
       authInitialized = true
-      return !!data?.session
+      
+      // Cleanup
+      subscription?.unsubscribe()
     } catch (error) {
       console.error('Error initializing Capacitor auth:', error)
-      return false
+      authInitialized = true
     }
   })()
 
-  return authPromise
+  await authPromise
 }
 
 // Wait for auth to be initialized and then get the current user
-export async function waitForAuthAndGetUser(maxWaitMs = 3000) {
-  const startTime = Date.now()
-  
+export async function waitForAuthAndGetUser(maxWaitMs = 5000) {
   // Initialize auth if not done yet
   await initializeCapacitorAuth()
+
+  const startTime = Date.now()
   
-  // Try to get user, with retries
+  // Wait for session to be restored
   while (Date.now() - startTime < maxWaitMs) {
     const { data } = await supabase.auth.getSession()
     
     if (data?.session?.user) {
+      console.log('User found after waiting:', data.session.user.id)
       return data.session.user
     }
     
     // Wait a bit before retrying
-    await new Promise(resolve => setTimeout(resolve, 100))
+    await new Promise(resolve => setTimeout(resolve, 200))
   }
   
+  // Final attempt to refresh
+  try {
+    const { data: refreshed } = await supabase.auth.refreshSession()
+    if (refreshed?.session?.user) {
+      console.log('User found after refresh:', refreshed.session.user.id)
+      return refreshed.session.user
+    }
+  } catch (error) {
+    console.error('Error refreshing session:', error)
+  }
+  
+  console.log('No user found after waiting')
   return null
 }
 
