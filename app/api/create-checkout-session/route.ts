@@ -38,6 +38,9 @@ export async function POST(request: NextRequest) {
 
     const stripeClient = getStripe()
 
+    // Get the origin from request headers for better reliability
+    const origin = request.headers.get('origin') || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
+
     // Create a Stripe customer
     const customer = await stripeClient.customers.create({
       email: userEmail,
@@ -68,8 +71,8 @@ export async function POST(request: NextRequest) {
         },
       ],
       mode: 'subscription',
-      success_url: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/pricing?success=true`,
-      cancel_url: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/pricing?canceled=true`,
+      success_url: `${origin}/pricing?success=true`,
+      cancel_url: `${origin}/pricing?canceled=true`,
       metadata: {
         userId: userId,
       },
