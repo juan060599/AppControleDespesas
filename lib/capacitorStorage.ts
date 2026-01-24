@@ -11,45 +11,38 @@ interface StorageAdapter {
 export class CapacitorStorage implements StorageAdapter {
   async getItem(key: string): Promise<string | null> {
     try {
-      if (!Capacitor.isNativePlatform()) {
-        return typeof window !== 'undefined' ? localStorage.getItem(key) : null
-      }
-
+      console.log('CapacitorStorage: Getting item -', key)
+      
+      // Always use Preferences (Capacitor native storage)
+      // Never use localStorage on native
       const { value } = await Preferences.get({ key })
+      console.log('CapacitorStorage: Got value -', key, !!value)
       return value || null
     } catch (error) {
-      console.error('Error getting item from storage:', error)
+      console.error('CapacitorStorage: Error getting item:', error)
       return null
     }
   }
 
   async setItem(key: string, value: string): Promise<void> {
     try {
-      if (!Capacitor.isNativePlatform()) {
-        if (typeof window !== 'undefined') {
-          localStorage.setItem(key, value)
-        }
-        return
-      }
-
+      console.log('CapacitorStorage: Setting item -', key)
+      
+      // Always use Preferences (Capacitor native storage)
       await Preferences.set({ key, value })
+      console.log('CapacitorStorage: Set item -', key)
     } catch (error) {
-      console.error('Error setting item in storage:', error)
+      console.error('CapacitorStorage: Error setting item:', error)
     }
   }
 
   async removeItem(key: string): Promise<void> {
     try {
-      if (!Capacitor.isNativePlatform()) {
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem(key)
-        }
-        return
-      }
-
+      console.log('CapacitorStorage: Removing item -', key)
       await Preferences.remove({ key })
+      console.log('CapacitorStorage: Removed item -', key)
     } catch (error) {
-      console.error('Error removing item from storage:', error)
+      console.error('CapacitorStorage: Error removing item:', error)
     }
   }
 }

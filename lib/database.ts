@@ -1,6 +1,5 @@
 import { supabase } from './supabase'
 import { Capacitor } from '@capacitor/core'
-import { waitForAuthAndGetUser } from './capacitorAuth'
 
 export interface User {
   id: string
@@ -66,26 +65,34 @@ export async function signOut() {
 
 export async function getCurrentUser() {
   try {
-    // On Capacitor/mobile, wait for auth to be initialized
-    if (Capacitor.isNativePlatform()) {
-      const user = await waitForAuthAndGetUser()
-      if (user) {
-        return user
-      }
+    console.log('getCurrentUser: Checking for user...')
+    
+    // First, try to get the session
+    const { data, error } = await supabase.auth.getSession()
+    
+    console.log('getCurrentUser: Session check -', { 
+      hasSession: !!data?.session,
+      hasUser: !!data?.session?.user,
+      error: error?.message 
+    })
+    
+    if (data?.session?.user) {
+      console.log('getCurrentUser: User found -', data.session.user.id)
+      return data.session.user
     }
     
-    // Regular flow for web
-    const { data } = await supabase.auth.getSession()
+    // If no session, try to refresh the token
+    console.log('getCurrentUser: No session found, trying to refresh...')
+    const { data: refreshed, error: refreshError } = await supabase.auth.refreshSession()
     
-    if (!data?.session?.user) {
-      // Try to refresh the session in case it expired
-      const { data: refreshed } = await supabase.auth.refreshSession()
-      return refreshed?.session?.user || null
-    }
+    console.log('getCurrentUser: Refresh attempt -', {
+      hasUser: !!refreshed?.session?.user,
+      error: refreshError?.message
+    })
     
-    return data.session.user
+    return refreshed?.session?.user || null
   } catch (error) {
-    console.error('Error getting current user:', error)
+    console.error('getCurrentUser: Error -', error)
     return null
   }
 }
