@@ -18,9 +18,20 @@ export default function TransactionList({ transactions }: TransactionListProps) 
   const handleDelete = async (id: string) => {
     if (confirm('Tem certeza que deseja deletar esta transação?')) {
       setDeleteLoading(id)
-      await deleteTransaction(id)
-      setDeleteLoading(null)
-      window.location.reload()
+      try {
+        const result = await deleteTransaction(id)
+        if (result.error) {
+          alert('Erro ao deletar: ' + result.error.message)
+          setDeleteLoading(null)
+          return
+        }
+        // Reload to reflect changes
+        window.location.reload()
+      } catch (error) {
+        console.error('Delete error:', error)
+        alert('Erro ao deletar transação')
+        setDeleteLoading(null)
+      }
     }
   }
 

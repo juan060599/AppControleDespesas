@@ -19,11 +19,15 @@ export default function PricingPage() {
       try {
         const currentUser = await getCurrentUser()
         if (!currentUser) {
-          router.push('/signin')
+          // Give a small delay to ensure session is loaded
+          setTimeout(() => {
+            router.push('/signin')
+          }, 500)
           return
         }
         setUser(currentUser)
       } catch (error) {
+        console.error('Error loading user:', error)
         router.push('/signin')
       } finally {
         setLoading(false)

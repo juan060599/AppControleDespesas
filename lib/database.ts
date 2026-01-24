@@ -63,8 +63,20 @@ export async function signOut() {
 }
 
 export async function getCurrentUser() {
-  const { data } = await supabase.auth.getSession()
-  return data?.session?.user
+  try {
+    const { data } = await supabase.auth.getSession()
+    
+    if (!data?.session?.user) {
+      // Try to refresh the session in case it expired
+      const { data: refreshed } = await supabase.auth.refreshSession()
+      return refreshed?.session?.user || null
+    }
+    
+    return data.session.user
+  } catch (error) {
+    console.error('Error getting current user:', error)
+    return null
+  }
 }
 
 // Transactions functions

@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { capacitorStorage } from './capacitorStorage'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
@@ -12,5 +13,14 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(
   supabaseUrl || '',
-  supabaseAnonKey || ''
+  supabaseAnonKey || '',
+  {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      // Use Capacitor storage for both web and mobile
+      storage: capacitorStorage,
+    },
+  }
 )
