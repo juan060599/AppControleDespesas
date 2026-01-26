@@ -2,38 +2,41 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { getCurrentUser } from '@/lib/database'
+import { getCurrentUser, signOut } from '@/lib/database'
 import DashboardHeader from '@/components/DashboardHeader'
 import { colors, spacing, typography, shadows, borderRadius, transitions } from '@/lib/designSystem'
 import { Check, Loader, ArrowLeft } from 'lucide-react'
 
 export default function PricingPage() {
+  const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [processing, setProcessing] = useState(false)
   const [error, setError] = useState('')
-  const router = useRouter()
 
   useEffect(() => {
     const loadUser = async () => {
       try {
         const currentUser = await getCurrentUser()
-        if (!currentUser) {
-          router.push('/signin')
-          return
-        }
         setUser(currentUser)
-      } catch (error) {
-        router.push('/signin')
+      } catch (err) {
+        console.error('Erro ao carregar usuário:', err)
       } finally {
         setLoading(false)
       }
     }
 
     loadUser()
-  }, [router])
+  }, [])
 
   const handleCheckout = async () => {
+    // Verificar autenticação APENAS no momento do checkout
+    if (!user) {
+      setError('Você precisa fazer login para continuar')
+      router.push('/signin')
+      return
+    }
+
     setProcessing(true)
     setError('')
 
@@ -67,35 +70,11 @@ export default function PricingPage() {
 
   const handleLogout = async () => {
     if (confirm('Tem certeza que deseja sair?')) {
-      const { signOut } = await import('@/lib/database')
       await signOut()
       router.push('/signin')
     }
   }
 
-  if (loading) {
-    return (
-      <div style={{ minHeight: '100vh', background: colors.background.lighter, width: '100%', overflow: 'hidden' }}>
-        <DashboardHeader userName={user?.email || 'Usuário'} onLogout={handleLogout} />
-        <main style={{ width: '100%', maxWidth: '100%', margin: '0 auto', padding: '12px', boxSizing: 'border-box' }}>
-          <style>{`
-            @media (min-width: 480px) {
-              main {
-                padding: 16px;
-              }
-            }
-            @media (min-width: 768px) {
-              main {
-                padding: 24px;
-                max-width: 1200px;
-              }
-            }
-          `}</style>
-          <p style={{ color: colors.secondary[500], textAlign: 'center' }}>Carregando...</p>
-        </main>
-      </div>
-    )
-  }
 
   return (
     <div style={{ minHeight: '100vh', background: colors.background.lighter, width: '100%', overflow: 'hidden' }}>

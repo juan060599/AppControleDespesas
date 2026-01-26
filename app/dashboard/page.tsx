@@ -25,16 +25,14 @@ export default function DashboardPage() {
       try {
         const currentUser = await getCurrentUser()
 
-        if (!currentUser) {
-          router.push('/signin')
-          return
-        }
+        // Não redirecionar para signin - apenas carregar dados se houver usuário
+        if (currentUser) {
+          setUser(currentUser)
 
-        setUser(currentUser)
-
-        const { data: transactionsData } = await getTransactions(currentUser.id)
-        if (transactionsData) {
-          setTransactions(transactionsData)
+          const { data: transactionsData } = await getTransactions(currentUser.id)
+          if (transactionsData) {
+            setTransactions(transactionsData)
+          }
         }
       } catch (error) {
         console.error('Error loading data:', error)
@@ -44,7 +42,7 @@ export default function DashboardPage() {
     }
 
     loadData()
-  }, [router])
+  }, [])
 
   const handleLogout = async () => {
     await signOut()

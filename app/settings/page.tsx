@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { getCurrentUser, signOut, getUserRole, setUserRole } from '@/lib/database'
+import { getCurrentUser, getUserRole, signOut } from '@/lib/database'
 import DashboardHeader from '@/components/DashboardHeader'
 import ApiKeySettings from '@/components/ApiKeySettings'
 import DangerZone from '@/components/DangerZone'
@@ -11,37 +11,34 @@ import { colors, spacing, typography } from '@/lib/designSystem'
 import { ArrowLeft } from 'lucide-react'
 
 export default function SettingsPage() {
+  const router = useRouter()
   const [user, setUser] = useState<any>(null)
-  const [userRole, setUserRoleState] = useState<'admin' | 'cliente'>('cliente')
   const [loading, setLoading] = useState(true)
+  const [userRole, setUserRoleState] = useState<'admin' | 'cliente'>('cliente')
   const [refreshTrigger, setRefreshTrigger] = useState(0)
   const [userEmail, setUserEmail] = useState('')
   const [newRole, setNewRole] = useState<'admin' | 'cliente'>('cliente')
   const [updateMessage, setUpdateMessage] = useState('')
-  const router = useRouter()
 
   useEffect(() => {
     const loadUser = async () => {
       try {
         const currentUser = await getCurrentUser()
-        if (!currentUser) {
-          router.push('/signin')
-          return
-        }
         setUser(currentUser)
 
-        // Carregar role do usuário
-        const { role } = await getUserRole(currentUser.id)
-        setUserRoleState(role as 'admin' | 'cliente')
+        if (currentUser?.id) {
+          const { role } = await getUserRole(currentUser.id)
+          setUserRoleState(role as 'admin' | 'cliente')
+        }
       } catch (error) {
-        router.push('/signin')
+        console.error('Error loading user:', error)
       } finally {
         setLoading(false)
       }
     }
 
     loadUser()
-  }, [router, refreshTrigger])
+  }, [refreshTrigger])
 
   const handleLogout = async () => {
     const confirmed = window.confirm('Tem certeza que deseja sair?')
