@@ -17,14 +17,7 @@ export const metadata: Metadata = {
   formatDetection: {
     telephone: false,
   },
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 5,
-    minimumScale: 1,
-    userScalable: true,
-    viewportFit: 'cover',
-  },
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=5, minimum-scale=1, user-scalable=yes, viewport-fit=cover',
 }
 
 export default function RootLayout({
@@ -41,28 +34,8 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="FinControl" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, minimum-scale=1, user-scalable=yes, viewport-fit=cover" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.svg" />
         <link rel="icon" type="image/svg+xml" href="/icons/icon-192x192.svg" />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if (document.documentElement) {
-                document.documentElement.style.width = '100vw';
-                document.documentElement.style.height = '100vh';
-                document.documentElement.style.margin = '0';
-                document.documentElement.style.padding = '0';
-              }
-              if (document.body) {
-                document.body.style.width = '100%';
-                document.body.style.height = '100%';
-                document.body.style.margin = '0';
-                document.body.style.padding = '0';
-                document.body.style.overflowX = 'hidden';
-              }
-            `,
-          }}
-        />
       </head>
       <body>{children}</body>
     </html>
