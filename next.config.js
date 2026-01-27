@@ -10,7 +10,8 @@ const withPWA = require('next-pwa')({
 
 const nextConfig = {
   reactStrictMode: true,
-  output: 'export', // Para gerar HTML estático em ./out
+  // output: 'export' foi removido para permitir Route Handlers (API routes)
+  // Se precisar de geração estática, use ISR (Incremental Static Regeneration) ou SSG parcial
 }
 
 module.exports = withPWA(nextConfig)
