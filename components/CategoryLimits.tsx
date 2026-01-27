@@ -198,12 +198,9 @@ export default function CategoryLimits({ userId, onLimitsUpdated }: CategoryLimi
         </p>
         <div style={{ 
           display: 'grid', 
-          gridTemplateColumns: 'clamp(120px, 40%, 200px) clamp(100px, 30%, 180px) auto',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(clamp(100px, 30%, 180px), 1fr))',
           gap: 'clamp(8px, 2vw, 12px)', 
           alignItems: 'end',
-          '@media (max-width: 480px)': {
-            gridTemplateColumns: '1fr',
-          }
         }}>
           <div>
             <label style={{ fontSize: 'clamp(11px, 1.5vw, 12px)', color: colors.secondary[700], display: 'block', marginBottom: 'clamp(4px, 1vw, 6px)', fontWeight: 600 }}>

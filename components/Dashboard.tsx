@@ -14,6 +14,7 @@ import { TrendingUp, TrendingDown, BarChart3, Plus } from 'lucide-react'
 interface DashboardProps {
   transactions: Transaction[]
   userId: string
+  onTransactionAdded?: () => void
 }
 
 type TabType = 'overview' | 'insights'
@@ -28,7 +29,7 @@ const PERIOD_LABELS: Record<PeriodType, string> = {
   'all-time': 'Desde o Início',
 }
 
-export default function Dashboard({ transactions, userId }: DashboardProps) {
+export default function Dashboard({ transactions, userId, onTransactionAdded }: DashboardProps) {
   const [activeTab, setActiveTab] = useState<TabType>('overview')
   const [selectedPeriod, setSelectedPeriod] = useState<PeriodType>('current-month')
   const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([])
@@ -698,6 +699,7 @@ export default function Dashboard({ transactions, userId }: DashboardProps) {
                   onTransactionAdded={() => {
                     setShowTransactionForm(false)
                     setRefreshTrigger(prev => prev + 1)
+                    onTransactionAdded?.()
                   }}
                 />
               </div>

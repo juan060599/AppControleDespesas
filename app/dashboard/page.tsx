@@ -142,7 +142,7 @@ export default function DashboardPage() {
           } as React.CSSProperties}>
             {/* Dashboard Section */}
             <section>
-              <Dashboard transactions={transactions} userId={user.id} />
+              <Dashboard transactions={transactions} userId={user.id} onTransactionAdded={handleTransactionAdded} />
             </section>
 
             {/* Bank Statement Upload Section */}
