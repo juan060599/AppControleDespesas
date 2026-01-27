@@ -157,25 +157,26 @@ export default function CategoryLimits({ userId, onLimitsUpdated }: CategoryLimi
   return (
     <section
       style={{
-        padding: spacing.lg,
+        padding: 'clamp(12px, 3vw, 20px)',
         backgroundColor: colors.background.light,
         borderRadius: '12px',
         border: `1px solid ${colors.primary[100]}`,
       }}
     >
-      <h3 style={{ ...typography.h3, margin: `0 0 ${spacing.md} 0`, color: colors.secondary[900] }}>
+      <h3 style={{ fontSize: 'clamp(16px, 3.5vw, 20px)', margin: `0 0 clamp(12px, 2vw, 16px) 0`, color: colors.secondary[900], fontWeight: 700 }}>
         📊 Limites por Categoria
       </h3>
 
       {message && (
         <div
           style={{
-            padding: spacing.md,
-            marginBottom: spacing.md,
+            padding: 'clamp(10px, 2vw, 12px)',
+            marginBottom: 'clamp(12px, 2vw, 16px)',
             backgroundColor: message.type === 'success' ? colors.status.success + '15' : colors.status.error + '15',
             border: `1px solid ${message.type === 'success' ? colors.status.success : colors.status.error}`,
             borderRadius: '6px',
             color: message.type === 'success' ? colors.status.success : colors.status.error,
+            fontSize: 'clamp(12px, 1.8vw, 14px)',
           }}
         >
           {message.text}
@@ -185,19 +186,27 @@ export default function CategoryLimits({ userId, onLimitsUpdated }: CategoryLimi
       {/* Adicionar novo limite */}
       <div
         style={{
-          padding: spacing.md,
+          padding: 'clamp(12px, 2vw, 16px)',
           backgroundColor: colors.background.lighter,
           borderRadius: '8px',
-          marginBottom: spacing.lg,
+          marginBottom: 'clamp(12px, 2vw, 16px)',
           border: `1px solid ${colors.primary[100]}`,
         }}
       >
-        <p style={{ ...typography.small, margin: `0 0 ${spacing.md} 0`, color: colors.secondary[700], fontWeight: 'bold' }}>
-          Adicionar novo limite
+        <p style={{ fontSize: 'clamp(12px, 2vw, 13px)', margin: `0 0 clamp(10px, 1.5vw, 12px) 0`, color: colors.secondary[700], fontWeight: 'bold' }}>
+          ➕ Adicionar Novo Limite
         </p>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: spacing.md, alignItems: 'end' }}>
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'clamp(120px, 40%, 200px) clamp(100px, 30%, 180px) auto',
+          gap: 'clamp(8px, 2vw, 12px)', 
+          alignItems: 'end',
+          '@media (max-width: 480px)': {
+            gridTemplateColumns: '1fr',
+          }
+        }}>
           <div>
-            <label style={{ ...typography.small, color: colors.secondary[700], display: 'block', marginBottom: spacing.xs }}>
+            <label style={{ fontSize: 'clamp(11px, 1.5vw, 12px)', color: colors.secondary[700], display: 'block', marginBottom: 'clamp(4px, 1vw, 6px)', fontWeight: 600 }}>
               Categoria
             </label>
             <select
@@ -205,35 +214,35 @@ export default function CategoryLimits({ userId, onLimitsUpdated }: CategoryLimi
               onChange={(e) => setNewCategory(e.target.value)}
               style={{
                 width: '100%',
-                padding: spacing.md,
+                padding: 'clamp(8px, 1.5vw, 10px)',
                 border: `1px solid ${colors.primary[200]}`,
                 borderRadius: '6px',
-                fontSize: typography.body.fontSize,
+                fontSize: 'clamp(12px, 1.8vw, 14px)',
                 fontFamily: 'inherit',
                 boxSizing: 'border-box',
               }}
             >
-              <option value="">Selecione uma categoria</option>
+              <option value="">Selecione</option>
               {availableCategories.map((cat) => (
                 <option key={cat} value={cat}>
                   {cat}
                 </option>
               ))}
-              <option value="custom">Outra (digitar)</option>
+              <option value="custom">Outra</option>
             </select>
             {newCategory === 'custom' && (
               <input
                 type="text"
-                placeholder="Nome da categoria"
+                placeholder="Nome"
                 value={newCategory === 'custom' ? '' : newCategory}
                 onChange={(e) => setNewCategory(e.target.value)}
                 style={{
                   width: '100%',
-                  padding: spacing.md,
-                  marginTop: spacing.xs,
+                  padding: 'clamp(8px, 1.5vw, 10px)',
+                  marginTop: 'clamp(6px, 1vw, 8px)',
                   border: `1px solid ${colors.primary[200]}`,
                   borderRadius: '6px',
-                  fontSize: typography.body.fontSize,
+                  fontSize: 'clamp(12px, 1.8vw, 14px)',
                   fontFamily: 'inherit',
                   boxSizing: 'border-box',
                 }}
@@ -242,7 +251,7 @@ export default function CategoryLimits({ userId, onLimitsUpdated }: CategoryLimi
           </div>
 
           <div>
-            <label style={{ ...typography.small, color: colors.secondary[700], display: 'block', marginBottom: spacing.xs }}>
+            <label style={{ fontSize: 'clamp(11px, 1.5vw, 12px)', color: colors.secondary[700], display: 'block', marginBottom: 'clamp(4px, 1vw, 6px)', fontWeight: 600 }}>
               Limite (R$)
             </label>
             <input
@@ -254,10 +263,10 @@ export default function CategoryLimits({ userId, onLimitsUpdated }: CategoryLimi
               min="0"
               style={{
                 width: '100%',
-                padding: spacing.md,
+                padding: 'clamp(8px, 1.5vw, 10px)',
                 border: `1px solid ${colors.primary[200]}`,
                 borderRadius: '6px',
-                fontSize: typography.body.fontSize,
+                fontSize: 'clamp(12px, 1.8vw, 14px)',
                 fontFamily: 'monospace',
                 boxSizing: 'border-box',
               }}
@@ -268,7 +277,7 @@ export default function CategoryLimits({ userId, onLimitsUpdated }: CategoryLimi
             onClick={handleAddLimit}
             disabled={saving}
             style={{
-              padding: `${spacing.md} ${spacing.lg}`,
+              padding: `clamp(8px, 1.5vw, 10px) clamp(10px, 2vw, 14px)`,
               backgroundColor: colors.primary[500],
               color: '#fff',
               border: 'none',
@@ -278,103 +287,131 @@ export default function CategoryLimits({ userId, onLimitsUpdated }: CategoryLimi
               opacity: saving ? 0.6 : 1,
               display: 'flex',
               alignItems: 'center',
-              gap: spacing.sm,
+              justifyContent: 'center',
+              gap: 'clamp(4px, 1vw, 6px)',
               whiteSpace: 'nowrap',
+              fontSize: 'clamp(12px, 1.8vw, 14px)',
+              minHeight: '38px',
             }}
           >
-            <Plus size={18} />
-            Adicionar
+            <Plus size='clamp(16px, 3vw, 18px)' />
+            <span style={{ display: 'inline' }}>Adicionar</span>
           </button>
         </div>
       </div>
 
-      {/* Lista de limites */}
+      {/* Lista de limites - Grid compacta */}
       {limits.length > 0 ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.md }}>
+        <div style={{ 
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(clamp(140px, 40%, 200px), 1fr))',
+          gap: 'clamp(8px, 2vw, 12px)',
+        }}>
           {limits.map((limit) => (
             <div
               key={limit.id}
               style={{
-                padding: spacing.md,
+                padding: 'clamp(10px, 2vw, 14px)',
                 backgroundColor: colors.background.lighter,
                 borderRadius: '8px',
                 border: `1px solid ${colors.primary[100]}`,
                 display: 'flex',
-                alignItems: 'center',
-                gap: spacing.md,
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                minHeight: '140px',
+                transition: 'all 0.2s ease',
+                boxShadow: `0 2px 4px ${colors.secondary[100]}`,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = `0 4px 8px ${colors.primary[100]}`
+                e.currentTarget.style.transform = 'translateY(-2px)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = `0 2px 4px ${colors.secondary[100]}`
+                e.currentTarget.style.transform = 'translateY(0)'
               }}
             >
               <div style={{ flex: 1 }}>
-                <p style={{ ...typography.body, margin: 0, fontWeight: 'bold', color: colors.secondary[900] }}>
+                <p style={{ fontSize: 'clamp(13px, 2vw, 14px)', margin: 0, fontWeight: 'bold', color: colors.secondary[900], wordBreak: 'break-word' }}>
                   {limit.category}
                 </p>
                 {editingId === limit.id ? (
-                  <div style={{ display: 'flex', gap: spacing.sm, marginTop: spacing.xs }}>
+                  <div style={{ display: 'flex', gap: 'clamp(4px, 1vw, 6px)', marginTop: 'clamp(8px, 1.5vw, 10px)', flexDirection: 'column' }}>
                     <input
                       type="number"
                       value={editValue}
                       onChange={(e) => setEditValue(e.target.value)}
                       step="0.01"
                       min="0"
+                      autoFocus
                       style={{
-                        padding: spacing.sm,
+                        padding: 'clamp(6px, 1vw, 8px)',
                         border: `1px solid ${colors.primary[200]}`,
                         borderRadius: '4px',
-                        fontSize: typography.body.fontSize,
+                        fontSize: 'clamp(12px, 1.8vw, 13px)',
                         fontFamily: 'monospace',
+                        boxSizing: 'border-box',
                       }}
                     />
-                    <button
-                      onClick={() => handleEditSave(limit.id)}
-                      style={{
-                        padding: `${spacing.xs} ${spacing.sm}`,
-                        backgroundColor: colors.status.success,
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: spacing.xs,
-                      }}
-                    >
-                      <Save size={16} />
-                      Salvar
-                    </button>
-                    <button
-                      onClick={() => setEditingId(null)}
-                      style={{
-                        padding: `${spacing.xs} ${spacing.sm}`,
-                        backgroundColor: colors.status.error,
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: spacing.xs,
-                      }}
-                    >
-                      <X size={16} />
-                      Cancelar
-                    </button>
+                    <div style={{ display: 'flex', gap: 'clamp(4px, 1vw, 6px)' }}>
+                      <button
+                        onClick={() => handleEditSave(limit.id)}
+                        style={{
+                          flex: 1,
+                          padding: `clamp(4px, 0.8vw, 6px) clamp(6px, 1vw, 8px)`,
+                          backgroundColor: colors.status.success,
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 'clamp(2px, 0.5vw, 4px)',
+                          fontSize: 'clamp(11px, 1.5vw, 12px)',
+                        }}
+                      >
+                        <Save size={14} />
+                        <span style={{ display: 'inline' }}>Salvar</span>
+                      </button>
+                      <button
+                        onClick={() => setEditingId(null)}
+                        style={{
+                          flex: 1,
+                          padding: `clamp(4px, 0.8vw, 6px) clamp(6px, 1vw, 8px)`,
+                          backgroundColor: colors.status.error,
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 'clamp(2px, 0.5vw, 4px)',
+                          fontSize: 'clamp(11px, 1.5vw, 12px)',
+                        }}
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
                   </div>
                 ) : (
-                  <p style={{ ...typography.small, margin: `${spacing.xs} 0 0 0`, color: colors.secondary[600] }}>
-                    R$ {limit.limit_amount.toFixed(2)}
+                  <p style={{ fontSize: 'clamp(14px, 2.5vw, 16px)', margin: `clamp(6px, 1vw, 8px) 0 0 0`, color: colors.primary[600], fontWeight: 'bold', fontFamily: 'monospace' }}>
+                    R$ {limit.limit_amount.toFixed(2).replace('.', ',')}
                   </p>
                 )}
               </div>
 
               {editingId !== limit.id && (
-                <div style={{ display: 'flex', gap: spacing.sm }}>
+                <div style={{ display: 'flex', gap: 'clamp(6px, 1vw, 8px)', marginTop: 'clamp(8px, 1.5vw, 10px)' }}>
                   <button
                     onClick={() => {
                       setEditingId(limit.id)
                       setEditValue(limit.limit_amount.toString())
                     }}
                     style={{
-                      padding: spacing.sm,
+                      flex: 1,
+                      padding: 'clamp(6px, 1vw, 8px)',
                       backgroundColor: colors.primary[100],
                       border: `1px solid ${colors.primary[200]}`,
                       borderRadius: '6px',
@@ -382,15 +419,20 @@ export default function CategoryLimits({ userId, onLimitsUpdated }: CategoryLimi
                       color: colors.primary[600],
                       display: 'flex',
                       alignItems: 'center',
-                      gap: spacing.xs,
+                      justifyContent: 'center',
+                      gap: 'clamp(2px, 0.5vw, 4px)',
+                      fontSize: 'clamp(11px, 1.5vw, 12px)',
                     }}
+                    title="Editar"
                   >
-                    <Edit2 size={16} />
+                    <Edit2 size={14} />
+                    <span style={{ display: 'inline' }}>Editar</span>
                   </button>
                   <button
                     onClick={() => handleDelete(limit.id)}
                     style={{
-                      padding: spacing.sm,
+                      flex: 1,
+                      padding: 'clamp(6px, 1vw, 8px)',
                       backgroundColor: colors.status.error + '20',
                       border: `1px solid ${colors.status.error}`,
                       borderRadius: '6px',
@@ -398,10 +440,14 @@ export default function CategoryLimits({ userId, onLimitsUpdated }: CategoryLimi
                       color: colors.status.error,
                       display: 'flex',
                       alignItems: 'center',
-                      gap: spacing.xs,
+                      justifyContent: 'center',
+                      gap: 'clamp(2px, 0.5vw, 4px)',
+                      fontSize: 'clamp(11px, 1.5vw, 12px)',
                     }}
+                    title="Deletar"
                   >
-                    <Trash2 size={16} />
+                    <Trash2 size={14} />
+                    <span style={{ display: 'inline' }}>Deletar</span>
                   </button>
                 </div>
               )}
@@ -409,8 +455,8 @@ export default function CategoryLimits({ userId, onLimitsUpdated }: CategoryLimi
           ))}
         </div>
       ) : (
-        <p style={{ ...typography.small, color: colors.secondary[500], textAlign: 'center', padding: spacing.lg, margin: 0 }}>
-          Nenhum limite configurado ainda
+        <p style={{ fontSize: 'clamp(12px, 1.8vw, 14px)', color: colors.secondary[500], textAlign: 'center', padding: 'clamp(20px, 4vw, 32px)', margin: 0 }}>
+          📭 Nenhum limite configurado
         </p>
       )}
     </section>
