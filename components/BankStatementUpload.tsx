@@ -253,35 +253,37 @@ export default function BankStatementUpload({ onTransactionsAdded }: BankStateme
         borderRadius: borderRadius.xl,
         boxShadow: shadows.md,
         border: `1px solid ${colors.primary[100]}`,
-        padding: spacing.xl,
+        padding: 'clamp(12px, 3vw, 24px)',
       }}
     >
       {/* Header */}
       <div
         style={{
           display: 'flex',
-          alignItems: 'center',
-          gap: spacing.md,
-          marginBottom: spacing.lg,
+          alignItems: 'flex-start',
+          gap: 'clamp(8px, 2vw, 16px)',
+          marginBottom: 'clamp(12px, 2vw, 16px)',
+          flexWrap: 'wrap',
         }}
       >
         <div
           style={{
-            width: '44px',
-            height: '44px',
+            width: 'clamp(36px, 8vw, 44px)',
+            height: 'clamp(36px, 8vw, 44px)',
             background: colors.primary[100],
             borderRadius: borderRadius.lg,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            flexShrink: 0,
           }}
         >
-          <Upload size={24} color={colors.primary[600]} />
+          <Upload size='clamp(18px, 4vw, 24px)' color={colors.primary[600]} />
         </div>
-        <div style={{ flex: 1 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
           <h2
             style={{
-              fontSize: typography.h4.fontSize,
+              fontSize: 'clamp(14px, 3.5vw, 20px)',
               fontWeight: 700,
               color: colors.secondary[900],
               margin: 0,
@@ -291,7 +293,7 @@ export default function BankStatementUpload({ onTransactionsAdded }: BankStateme
           </h2>
           <p
             style={{
-              fontSize: typography.small.fontSize,
+              fontSize: 'clamp(12px, 2vw, 13px)',
               color: colors.secondary[500],
               margin: '4px 0 0 0',
             }}
@@ -301,22 +303,24 @@ export default function BankStatementUpload({ onTransactionsAdded }: BankStateme
         </div>
         <div
           style={{
-            padding: `${spacing.sm} ${spacing.md}`,
+            padding: `clamp(6px, 1.5vw, 8px) clamp(8px, 2vw, 12px)`,
             backgroundColor: analysisCount >= analysisLimit && analysisLimit !== 999999 ? colors.status.error + '15' : colors.primary[50],
             borderRadius: borderRadius.md,
             border: `1px solid ${analysisCount >= analysisLimit && analysisLimit !== 999999 ? colors.status.error : colors.primary[200]}`,
             textAlign: 'center',
+            flexShrink: 0,
+            whiteSpace: 'nowrap',
           }}
         >
-          <p style={{ ...typography.label, margin: 0, color: colors.secondary[900] }}>
-            {isAdmin ? '∞ Ilimitado' : `${analysisCount}/${analysisLimit} análises`}
+          <p style={{ fontSize: 'clamp(11px, 1.8vw, 13px)', fontWeight: 600, margin: 0, color: colors.secondary[900] }}>
+            {isAdmin ? '∞' : `${analysisCount}/${analysisLimit}`}
           </p>
           <p style={{
-            ...typography.small,
-            margin: `${spacing.xs} 0 0 0`,
+            fontSize: 'clamp(10px, 1.5vw, 11px)',
+            margin: `2px 0 0 0`,
             color: isAdmin ? colors.status.success : (analysisCount >= analysisLimit ? colors.status.error : colors.secondary[500]),
           }}>
-            {isAdmin ? '👑 Admin - Análises ilimitadas' : (analysisCount >= analysisLimit ? '❌ Limite atingido' : `${analysisLimit - analysisCount} restantes`)}
+            {isAdmin ? '👑' : (analysisCount >= analysisLimit ? '❌' : '✓')}
           </p>
         </div>
       </div>
@@ -325,13 +329,13 @@ export default function BankStatementUpload({ onTransactionsAdded }: BankStateme
       {transactions.length === 0 && (
         <div
           style={{
-            marginBottom: spacing.lg,
+            marginBottom: 'clamp(12px, 2vw, 16px)',
           }}
         >
           <label
             style={{
               display: 'block',
-              padding: spacing.xl,
+              padding: 'clamp(12px, 3vw, 20px)',
               border: `2px dashed ${colors.primary[300]}`,
               borderRadius: borderRadius.lg,
               textAlign: 'center',
@@ -359,20 +363,23 @@ export default function BankStatementUpload({ onTransactionsAdded }: BankStateme
               }
             }}
           >
-            <FileText size={32} color={colors.primary[500]} style={{ margin: '0 auto 12px' }} />
+            <FileText size='clamp(24px, 6vw, 32px)' color={colors.primary[500]} style={{ margin: '0 auto clamp(8px, 2vw, 12px)' }} />
             <p
               style={{
-                fontSize: typography.body.fontSize,
+                fontSize: 'clamp(13px, 2.5vw, 16px)',
                 fontWeight: 600,
                 color: colors.secondary[900],
                 margin: '0 0 4px 0',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
               }}
             >
-              {file ? file.name : 'Arrastar ou clicar para selecionar'}
+              {file ? file.name : 'Arrastar ou clicar'}
             </p>
             <p
               style={{
-                fontSize: typography.small.fontSize,
+                fontSize: 'clamp(11px, 1.8vw, 13px)',
                 color: colors.secondary[500],
                 margin: 0,
               }}
@@ -391,8 +398,9 @@ export default function BankStatementUpload({ onTransactionsAdded }: BankStateme
             <div
               style={{
                 display: 'flex',
-                gap: spacing.md,
-                marginTop: spacing.lg,
+                gap: 'clamp(8px, 2vw, 12px)',
+                marginTop: 'clamp(12px, 2vw, 16px)',
+                flexWrap: 'wrap',
               }}
             >
               <button
@@ -400,14 +408,15 @@ export default function BankStatementUpload({ onTransactionsAdded }: BankStateme
                 disabled={loading || !file}
                 style={{
                   flex: 1,
-                  padding: `${spacing.md} ${spacing.lg}`,
+                  minWidth: '150px',
+                  padding: `clamp(8px, 1.5vw, 12px) clamp(12px, 2vw, 16px)`,
                   background: loading
                     ? colors.secondary[300]
                     : `linear-gradient(135deg, ${colors.primary[500]} 0%, ${colors.primary[600]} 100%)`,
                   color: colors.background.light,
                   border: 'none',
                   borderRadius: borderRadius.lg,
-                  fontSize: typography.label.fontSize,
+                  fontSize: 'clamp(13px, 2vw, 15px)',
                   fontWeight: 600,
                   cursor: loading ? 'not-allowed' : 'pointer',
                   transition: transitions.normal,
@@ -416,11 +425,11 @@ export default function BankStatementUpload({ onTransactionsAdded }: BankStateme
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: spacing.sm,
+                  gap: 'clamp(6px, 1vw, 8px)',
                 }}
               >
-                {loading && <Loader size={18} style={{ animation: 'spin 1s linear infinite' }} />}
-                {loading ? 'Analisando...' : 'Analisar com IA'}
+                {loading && <Loader size='clamp(14px, 3vw, 18px)' style={{ animation: 'spin 1s linear infinite' }} />}
+                {loading ? 'Analisando...' : 'Analisar'}
               </button>
 
               <button
@@ -430,12 +439,12 @@ export default function BankStatementUpload({ onTransactionsAdded }: BankStateme
                   setSuccess('')
                 }}
                 style={{
-                  padding: `${spacing.md} ${spacing.lg}`,
+                  padding: `clamp(8px, 1.5vw, 12px) clamp(12px, 2vw, 16px)`,
                   background: colors.secondary[100],
                   color: colors.secondary[600],
                   border: `1px solid ${colors.secondary[200]}`,
                   borderRadius: borderRadius.lg,
-                  fontSize: typography.label.fontSize,
+                  fontSize: 'clamp(13px, 2vw, 15px)',
                   fontWeight: 600,
                   cursor: 'pointer',
                   transition: transitions.normal,

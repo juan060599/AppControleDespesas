@@ -219,16 +219,20 @@ export default function TransactionList({ transactions }: TransactionListProps) 
                 <div style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: spacing.lg,
-                  marginLeft: spacing.lg,
+                  gap: 'clamp(6px, 1.5vw, 12px)',
+                  marginLeft: 'clamp(8px, 2vw, 12px)',
+                  flexShrink: 0,
                 }}>
                   {/* Amount */}
-                  <div style={{ textAlign: 'right', minWidth: '120px' }}>
+                  <div style={{ textAlign: 'right', minWidth: 'clamp(70px, 25vw, 120px)', maxWidth: '100%' }}>
                     <p style={{
-                      fontSize: '18px',
+                      fontSize: 'clamp(13px, 2.5vw, 16px)',
                       fontWeight: 700,
                       color: transaction.type === 'income' ? colors.status.success : colors.status.error,
                       margin: 0,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
                     }}>
                       {transaction.type === 'income' ? '+' : '-'} {formatCurrency(transaction.amount)}
                     </p>
@@ -239,8 +243,8 @@ export default function TransactionList({ transactions }: TransactionListProps) 
                     onClick={() => handleDelete(transaction.id)}
                     disabled={deleteLoading === transaction.id}
                     style={{
-                      width: '40px',
-                      height: '40px',
+                      width: 'clamp(32px, 8vw, 40px)',
+                      height: 'clamp(32px, 8vw, 40px)',
                       background: colors.status.error + '15',
                       border: `1px solid ${colors.status.error}20`,
                       borderRadius: borderRadius.lg,
@@ -252,6 +256,7 @@ export default function TransactionList({ transactions }: TransactionListProps) 
                       justifyContent: 'center',
                       flexShrink: 0,
                       opacity: deleteLoading === transaction.id ? 0.6 : 1,
+                      padding: 0,
                     }}
                     onMouseEnter={(e) => {
                       if (deleteLoading !== transaction.id) {
@@ -266,15 +271,15 @@ export default function TransactionList({ transactions }: TransactionListProps) 
                       }
                     }}
                   >
-                    <Trash2 size={18} />
+                    <Trash2 size='clamp(14px, 3vw, 18px)' />
                   </button>
 
                   {/* Edit Button */}
                   <button
                     onClick={() => handleEditClick(transaction)}
                     style={{
-                      width: '40px',
-                      height: '40px',
+                      width: 'clamp(32px, 8vw, 40px)',
+                      height: 'clamp(32px, 8vw, 40px)',
                       background: colors.primary[100],
                       border: `1px solid ${colors.primary[200]}`,
                       borderRadius: borderRadius.lg,
@@ -285,6 +290,7 @@ export default function TransactionList({ transactions }: TransactionListProps) 
                       alignItems: 'center',
                       justifyContent: 'center',
                       flexShrink: 0,
+                      padding: 0,
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.background = colors.primary[200]
@@ -295,7 +301,7 @@ export default function TransactionList({ transactions }: TransactionListProps) 
                       e.currentTarget.style.borderColor = colors.primary[200]
                     }}
                   >
-                    <Edit2 size={18} />
+                    <Edit2 size='clamp(14px, 3vw, 18px)' />
                   </button>
                 </div>
               </div>
