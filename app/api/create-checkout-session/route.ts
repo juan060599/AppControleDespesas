@@ -39,8 +39,8 @@ export async function POST(request: NextRequest) {
           price_data: {
             currency: 'brl',
             product_data: {
-              name: 'FinControl Pro - 5 Análises Mensais',
-              description: '5 análises de extratos com IA por mês',
+              name: 'FinControl Pro - Análises Ilimitadas',
+              description: 'Análises ilimitadas de extratos com IA por mês',
             },
             unit_amount: 1990, // 19.90 em centavos
             recurring: {

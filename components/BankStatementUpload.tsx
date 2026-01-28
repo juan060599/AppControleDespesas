@@ -72,7 +72,7 @@ export default function BankStatementUpload({ onTransactionsAdded }: BankStateme
 
     // Verificar limite de análises (admin não tem limite)
     if (!isAdmin && analysisCount >= analysisLimit) {
-      setError(`❌ Você atingiu o limite de ${analysisLimit} análises este mês. Adquira o plano Pro para análises ilimitadas!`)
+      setError(`❌ Você atingiu o limite de ${analysisLimit} análises este mês. Renove sua assinatura Pro para análises ilimitadas!`)
       return
     }
 

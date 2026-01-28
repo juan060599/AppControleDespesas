@@ -253,6 +253,10 @@ export async function getUserPlan(userId: string) {
 }
 
 export async function setUserPlan(userId: string, planName: string, stripeSubscriptionId: string) {
+  // Calculate subscription dates (30 days from now)
+  const now = new Date()
+  const endDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
+  
   const { data, error } = await supabase
     .from('user_plans')
     .upsert([
@@ -261,6 +265,9 @@ export async function setUserPlan(userId: string, planName: string, stripeSubscr
         plan_name: planName,
         stripe_subscription_id: stripeSubscriptionId,
         active: true,
+        subscription_start_date: now.toISOString(),
+        subscription_end_date: endDate.toISOString(),
+        auto_renew: true,
       },
     ])
     .select()

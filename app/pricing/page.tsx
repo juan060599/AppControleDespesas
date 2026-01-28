@@ -545,13 +545,13 @@ export default function PricingPage() {
                   R$ 19,90
                 </div>
                 <p className="pricing-price-desc" style={{ color: colors.secondary[500] }}>
-                  por mês (5 análises)
+                  por mês (análises ilimitadas)
                 </p>
 
                 <ul className="pricing-features">
                   {[
                     '✓ Lançar transações manualmente',
-                    '✓ 5 análises com IA por mês',
+                    '✓ Análises ilimitadas com IA',
                     '✓ Sugestões de economia',
                     '✓ Alertas de despesas',
                     '✓ Planejamento de orçamento',
@@ -599,10 +599,10 @@ export default function PricingPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div className="pricing-faq-item">
                 <p className="pricing-faq-question" style={{ color: colors.secondary[900] }}>
-                  Como funciona o limite de 5 análises?
+                  Como funciona o Plano Pro?
                 </p>
                 <p className="pricing-faq-answer" style={{ color: colors.secondary[600] }}>
-                  Você pode fazer até 5 análises de extratos com IA por mês. Após atingir o limite, aguarde o mês seguinte.
+                  Com o Plano Pro, você tem análises ilimitadas com IA enquanto sua assinatura estiver ativa. Renove mensalmente para manter o acesso ilimitado.
                 </p>
               </div>
 
@@ -617,10 +617,10 @@ export default function PricingPage() {
 
               <div className="pricing-faq-item">
                 <p className="pricing-faq-question" style={{ color: colors.secondary[900] }}>
-                  Posso cancelar a qualquer momento?
+                  O que acontece se minha assinatura expirar?
                 </p>
                 <p className="pricing-faq-answer" style={{ color: colors.secondary[600] }}>
-                  Sim! Você pode cancelar sua assinatura a qualquer momento sem compromisso.
+                  Se sua assinatura expirar, você volta ao limite de 5 análises por mês. Renove a qualquer momento para recuperar acesso ilimitado.
                 </p>
               </div>
             </div>
